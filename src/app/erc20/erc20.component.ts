@@ -3,6 +3,8 @@ import { Erc20Service } from '@services/erc20.service';
 import { Observable } from 'rxjs/Observable';
 import { Token } from '@models/token';
 import { Subscription } from 'rxjs/Subscription';
+import { CanActivate } from '@angular/router';
+import { Web3Service } from '@services/web3.service';
 
 @Component({
   selector: 'app-erc20',

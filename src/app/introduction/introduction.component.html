@@ -1,0 +1,73 @@
+<h1>Welcome to the QNH Blockchain coding game</h1>
+
+<p>
+  This is the QNH Coding game, where there is no hype, but only technology. To us, blockchain is nothing but a way of
+  working and a niche way of solving problems in certain use cases. While playing along with the game, you'll learn and
+  explore
+  certain use cases in which you can use blockchain.
+</p>
+<p>
+  This game has four tasks, including this one. Doing one task unlocks the next one. In this task, you have to prepare
+  your system to work with the Ethereum blockchain. If you have done the steps below, click the "Submit" button below.
+</p>
+<p>
+  First, you need to install NodeJS and npm from <a href="https://www.npmjs.com/get-npm">the NPM website</a>. As you'll
+  probably be running this web application from your own device, this should have succeeded. If you have not done so,
+  also run <span class="code">npm install</span> on the directory. This will install application dependencies, but
+  again, since this is
+  Angular, this should have been done before even starting the app.
+</p>
+<p>
+  Now it might be useful to start interacting with an Ethereum blockchain node. For this, we will use Go Ethereum
+  (GEth) instances. You can download Geth from <a href="https://ethereum.github.io/go-ethereum/downloads/">the Ethereum
+    download page</a>. Before heading right into using this tool, we'd suggest to not connect to the main network yet.
+  The Ethereum mainnet costs real money to use, as we will cover later on. Instead, this game is going to focus on
+  smaller, free networks. Unless you are doing this game on your own, you will be handed an address of the node you
+  will be
+  using in this game. You can fill this address in at the bottom of this page. You can test if your Geth instance is
+  working, by
+  using <span class="code">geth attach <b>address</b></span>, where <span class="code"><b>address</b></span> should be
+  replaced by the network address (including <span class="code">ws://</span> and the port number). This will open a
+  console on the ethereum node found and the address. You can best leave this console open, as we will be using it
+  later
+  on.
+</p>
+<p>
+  Next up, we will be working with Ethereum Smart Contracts. The development of smart contracts is a bit different to
+  other backend applications. We will cover the differences when we reach them. But this requires a different array of
+  tools.
+</p>
+<p>
+  In order to use smart contracts, we first need to write them. Ethereum smart contracts can be written in many
+  languages, such as Solidity, a language similar to Javascript and Viper, a language similar to python. The end goal
+  is to generate binary code which can be used by the Ethereum network. For the coding game, we will focus on writing
+  in Solidity. Solidity code is compiled into binary code using solc. You can get solc by executing <span class="code">npm
+    install --global solc</span>. This will allow the <span class="code">solcjs</span> command in Windows command
+  prompt or Bash, which we will use later. More information regarding Solidity can be found <a href="https://solidity.readthedocs.io/en/v0.4.24/">on
+    the Solidity ReadTheDocs</a>.
+</p>
+<p>
+  After installing the Solidity Compiler, you should be settled and ready to go. So, fill in below what node you want
+  to connect with. After that, fill in the your given private key. Finally, press submit and continue with the coding game.
+</p>
+<div class="input-wrapper">
+  <input [(ngModel)]="_nodeAddress" placeholder="Node address" />
+</div>
+<div class="input-wrapper">
+  <input [(ngModel)]="_privateKey" placeholder="Private key" />
+</div>
+<div class="button-wrapper">
+  <button (click)="sumbit()">
+    Submit
+  </button>
+</div>
+<p>
+  <i>
+    *: I want/need to setup my own Ethereum node. Well, luckily, a Github user by the name of <a href="https://github.com/jastam">jastam</a>
+    has made a Docker image that can setup a local Ethereum node. For this, you need to get Docker <a href="">from
+      their website</a>. After doing so, you can run the image with <span class="code">docker run jastam/geth</span>,
+    where it is advised to give it a convertional name, run it with a volume (so that the chain is persistent) and if
+    you want to continuniously run it, use it with restart unless-stopped. The total command should sum up to <span
+      class="code">docker run --name geth-client --volume geth-volume --restart unless-stopped jastam/geth</span>.
+  </i>
+</p>

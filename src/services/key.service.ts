@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Web3Service } from '@services/web3.service';
+import { Account } from 'web3/eth/accounts';
 
 @Injectable()
 export class KeyService {
@@ -6,18 +8,32 @@ export class KeyService {
   // TODO
   // This service is basically a clusterfck.service.ts at this point.
 
-  private _privateKey: string;
+  private _account: Account;
 
-  constructor() {
+  constructor(
+    private _web3Service: Web3Service
+  ) {
+    let privateKey = localStorage.getItem(this.storageKey);
+    while (!privateKey || !privateKey.length) {
+      privateKey = window.prompt('Er is nog geen keypair gevonden. Welke private key wil je gebruiken?');
+    }
+    this.setPrivateKey(privateKey);
+   }
 
+   getAddress(): string {
+     return this._account.address;
    }
 
   getPublicKey(): string {
-    return '0x88e94a4b7bfc62a38d300d98ce1c09f30fb75e3e';
+    return this._account.publicKey;
   }
 
   getPrivateKey(): string {
-    return '0x00351d8f054a232c52d86b6bf4acd372b6a844ab874e8508bb5b1e8117e47414';
+    return this._account.privateKey;
   }
 
+  public async setPrivateKey(privateKey: string): Promise<void> {
+    this._account = await this._web3Service.getAccountByPrivateKey(privateKey);
+    localStorage.setItem(this.storageKey, privateKey);
+  }
 }

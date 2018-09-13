@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import * as TokenAbi from '@contracts/erc20';
+import * as TokenContract from '@contracts/erc20';
 import { Web3Service } from '@services/web3.service';
 import { environment } from '@environments/environment';
 import Contract from 'web3/eth/contract';
 import { Token } from '@models/token';
+import { KeyService } from '@services/key.service';
 
 @Injectable()
 export class Erc20Service {
@@ -14,17 +15,10 @@ export class Erc20Service {
   private _tokens: BehaviorSubject<Token[]> = new BehaviorSubject([]);
 
   constructor(
+    private _keyService: KeyService,
     private _web3Service: Web3Service
   ) {
-    const tokens = localStorage.getItem(this._storageKey);
-    if (!!tokens && !!tokens.length) {
-      try {
-        this._tokens.next(JSON.parse(tokens));
-      } catch (e) {
-        console.warn('Error while parsing localstorage.tokens. Resetting now...');
-        localStorage.setItem(this._storageKey, '');
-      }
-    }
+    this.initTokens();
   }
 
   /**
@@ -43,13 +37,13 @@ export class Erc20Service {
    * @param erc20Address The address of the token
    * @param accountAddress The address of the account
    */
-  async getBalanceOf(erc20Address: string, accountAddress: string): Promise<string> {
+  async getBalanceOf(erc20Address: string, accountAddress: string = this._keyService.getAddress()): Promise<string> {
     const contract = await this.getContract(erc20Address);
     return await contract.methods.balanceOf(accountAddress).call();
   }
 
   private async getContract(erc20Address: string = null): Promise<Contract> {
-    return this._web3Service.getContract(TokenAbi, erc20Address);
+    return this._web3Service.getContract(TokenContract.abi, erc20Address);
   }
 
   /**
@@ -61,6 +55,16 @@ export class Erc20Service {
     return await contract.methods.name().call();
   }
 
+  getTokenByAddress(tokenAddress: string): Token {
+    const tokens = this._tokens.getValue();
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].address === tokenAddress) {
+        return tokens[i];
+      }
+    }
+    return null;
+  }
+
   getTokens(): Observable<Token[]> {
     return this._tokens.asObservable();
   }
@@ -68,7 +72,7 @@ export class Erc20Service {
   hasTokenWithAddress(address: string): boolean {
     const tokens = this._tokens.getValue();
     let token: Token;
-    for (let i = 0; i < tokens.length; i++ ) {
+    for (let i = 0; i < tokens.length; i++) {
       token = tokens[i];
       if (token.address === address) {
         return true;
@@ -77,8 +81,46 @@ export class Erc20Service {
     return false;
   }
 
+  private initTokens(): void {
+    const tokenString = localStorage.getItem(this._storageKey);
+    if (!!tokenString && !!tokenString.length) {
+      try {
+        this._tokens.next(JSON.parse(tokenString));
+        const tokens = this._tokens.getValue();
+        for (let i = 0; i < tokens.length; i++) {
+          this.initTokenEventListener(tokens[i]);
+        }
+      } catch (e) {
+        console.warn('Error while parsing localstorage.tokens. Resetting now...');
+        localStorage.setItem(this._storageKey, '');
+      }
+    }
+  }
+
+  private async initTokenEventListener(token: Token): Promise<void> {
+    const tokenContract = await this.getContract(token.address);
+    tokenContract.events.Transfer({}, (error, event) => {
+      console.log(event.returnValues);
+      if (!error) {
+        this.updateToken(token);
+      } else {
+        console.error(error);
+      }
+    });
+  }
+
   private saveTokens(): void {
     localStorage.setItem(this._storageKey, JSON.stringify(this._tokens.getValue()));
+  }
+
+  private setToken(token: Token): void {
+    const tokens = this._tokens.getValue();
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].address === token.address) {
+        tokens[i] = token;
+        return;
+      }
+    }
   }
 
   /**
@@ -113,4 +155,33 @@ export class Erc20Service {
     return (!!receipt && !!receipt.status);
   }
 
+  private async updateToken(token: Token): Promise<void> {
+    if (!!token && this.hasTokenWithAddress(token.address)) {
+      let changed = false;
+      if (!token.name) {
+        const name = await this.getName(token.address);
+        token.name = name;
+        changed = true;
+      }
+      if (!token.decimals) {
+        // todo
+      }
+      const currentBalance = token.balance;
+      const newBalance = await this.getBalanceOf(token.address);
+      if (!!newBalance && currentBalance !== newBalance) {
+        token.balance = newBalance;
+        changed = true;
+      }
+      if (changed) {
+        this.setToken(token);
+      }
+    }
+  }
+
+  private async updateTokenByAddress(tokenAddress: string): Promise<void> {
+    const token = this.getTokenByAddress(tokenAddress);
+    if (!!token) {
+      this.updateToken(token);
+    }
+  }
 }

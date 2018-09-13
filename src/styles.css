@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+
+* {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.code {
+  font-family: 'Courier New', Courier, monospace;
+  background: #CCF;
+  font-size: 12px;
+  padding: 0 4px;
+}
