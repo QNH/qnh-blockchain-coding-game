@@ -1,0 +1,13 @@
+<table class="tokens">
+  <tr *ngFor="let token of _tokens">
+    <td class="token" [attr.data-address]="token.address">
+      <p>{{token.address}}</p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
+      <button (click)="addToken()">Add token</button>
+    </td>
+  </tr>
+</table>

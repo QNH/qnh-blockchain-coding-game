@@ -5,10 +5,11 @@
     "baseUrl": "src",
     "paths": {
       "@app/*": ["app/*"],
-      "@contracts/*": ["utils/contracts/*"],
+      "@contracts/*": ["contracts/*"],
+      "@environments/*": ["environments/*"],
       "@models/*": ["models/*"],
-      "@styles/*": ["assets/styles/*"],
-      "@utils/*": ["utils/*"]
+      "@services/*": ["services/*"],
+      "@styles/*": ["assets/styles/*"]
     },
     "sourceMap": true,
     "declaration": false,
