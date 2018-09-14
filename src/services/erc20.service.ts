@@ -109,6 +109,11 @@ export class Erc20Service {
     });
   }
 
+  reset(): void {
+    this._tokens.next([]);
+    this.saveTokens();
+  }
+
   private saveTokens(): void {
     localStorage.setItem(this._storageKey, JSON.stringify(this._tokens.getValue()));
   }

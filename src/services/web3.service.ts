@@ -7,7 +7,7 @@ import { Account } from 'web3/eth/accounts';
 import { CanActivate } from '@angular/router';
 
 @Injectable()
-export class Web3Service implements CanActivate {
+export class Web3Service {
   private readonly nodeAddressStorageKey = 'bcg-node-address';
 
   private _nodeAddress: string;
@@ -30,11 +30,7 @@ export class Web3Service implements CanActivate {
     return this._web3;
   }
 
-  canActivate(): boolean {
-    return (this.hasNodeAddress);
-  }
-
-  async getAccountByPrivateKey(privateKey: string): Promise<Account> {
+  getAccountByPrivateKey(privateKey: string): Account {
     try {
       return this.web3.eth.accounts.privateKeyToAccount(privateKey);
     } catch (e) {
@@ -53,29 +49,55 @@ export class Web3Service implements CanActivate {
   }
 
   get hasNodeAddress(): boolean {
-    return !!this._nodeAddress;
+    return !!this.nodeAddress;
   }
 
   async isValidNode(nodeAddress: string): Promise<boolean> {
     try {
       const web3 = new Web3(nodeAddress);
-      if (!!web3) {
-        if (!!web3.eth.currentProvider) {
-          return true;
-        }
+      if (!!web3 && !!web3.eth.currentProvider) {
+        const blockNumber = await web3.eth.getBlockNumber().catch(() => {
+          return 0;
+        });
+        return blockNumber > 0;
       }
     } catch (e) { }
     return false;
   }
 
+  /**
+   * Checks if a private key is valid
+   * @param privateKey The private key to be checked
+   * @returns True if valid, false if not.
+   */
   isValidPrivateKey(privateKey: string): boolean {
     try {
       const account = this.web3.eth.accounts.privateKeyToAccount(privateKey);
       if (!!account && !!account.address) {
         return true;
       }
-    } catch (e) {}
+    } catch (e) { }
     return false;
+  }
+
+  get nodeAddress(): string {
+    if (!this._nodeAddress || !this._nodeAddress.length) {
+      const nodeAddress = localStorage.getItem(this.nodeAddressStorageKey);
+      if (!!nodeAddress) {
+        this._nodeAddress = nodeAddress;
+      } else {
+        return null;
+      }
+    }
+    return this._nodeAddress;
+  }
+
+  /**
+   * Reset the node address of the app
+   */
+  resetNodeAddress(): void {
+    this._nodeAddress = '';
+    localStorage.setItem(this.nodeAddressStorageKey, '');
   }
 
   /**

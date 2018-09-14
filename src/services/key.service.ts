@@ -5,35 +5,67 @@ import { Account } from 'web3/eth/accounts';
 @Injectable()
 export class KeyService {
   private readonly storageKey = 'bcg-key';
-  // TODO
-  // This service is basically a clusterfck.service.ts at this point.
 
   private _account: Account;
+  private _privateKey: string;
 
   constructor(
     private _web3Service: Web3Service
-  ) {
-    let privateKey = localStorage.getItem(this.storageKey);
-    while (!privateKey || !privateKey.length) {
-      privateKey = window.prompt('Er is nog geen keypair gevonden. Welke private key wil je gebruiken?');
-    }
-    this.setPrivateKey(privateKey);
-   }
+  ) { }
 
-   getAddress(): string {
-     return this._account.address;
-   }
+  private get account(): Account {
+    if (!this._account && !!this.privateKey) {
+      this._account = this._web3Service.getAccountByPrivateKey(this.privateKey);
+    }
+    return this._account;
+  }
+
+  forceExistance(): void {
+    if (!this._account) {
+      let privateKey = localStorage.getItem(this.storageKey);
+      while (!privateKey || !privateKey.length) {
+        privateKey = window.prompt('Er is nog geen keypair gevonden. Welke private key wil je gebruiken?');
+      }
+      this.setPrivateKey(privateKey);
+    }
+  }
+
+  getAddress(): string {
+    this.forceExistance();
+    return this._account.address;
+  }
 
   getPublicKey(): string {
+    this.forceExistance();
     return this._account.publicKey;
   }
 
   getPrivateKey(): string {
+    this.forceExistance();
     return this._account.privateKey;
   }
 
+  get isPrivateKeySet(): boolean {
+    return !!this.privateKey;
+  }
+
+  get privateKey(): string {
+    if (!this._privateKey) {
+      this._privateKey = localStorage.getItem(this.storageKey);
+    }
+    return this._privateKey;
+  }
+
+  /**
+   * Reset the account the app uses
+   */
+  resetKey(): void {
+    delete this._account;
+    localStorage.setItem(this.storageKey, '');
+  }
+
   public async setPrivateKey(privateKey: string): Promise<void> {
-    this._account = await this._web3Service.getAccountByPrivateKey(privateKey);
-    localStorage.setItem(this.storageKey, privateKey);
+    this._privateKey = privateKey;
+    localStorage.setItem(this.storageKey, this._account.privateKey);
   }
 }

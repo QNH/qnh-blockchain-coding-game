@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { KeyService } from '@services/key.service';
 import { Web3Service } from '@services/web3.service';
+import { RouteService } from '@services/route.service';
 
 @Component({
   selector: 'app-introduction',
@@ -16,6 +17,7 @@ export class IntroductionComponent implements OnInit {
 
   constructor(
     private _keyService: KeyService,
+    private _routeService: RouteService,
     private _web3Service: Web3Service
   ) { }
 
@@ -39,6 +41,7 @@ export class IntroductionComponent implements OnInit {
       if (await this._web3Service.isValidPrivateKey(this._privateKey)) {
         this._privateKeyInvalid = false;
         this._keyService.setPrivateKey(this._privateKey);
+        this._routeService.navigateToPart2();
       } else {
         this._privateKeyInvalid = true;
       }
