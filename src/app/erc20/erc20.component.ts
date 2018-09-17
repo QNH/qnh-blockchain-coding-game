@@ -5,6 +5,7 @@ import { Token } from '@models/token';
 import { Subscription } from 'rxjs/Subscription';
 import { CanActivate } from '@angular/router';
 import { Web3Service } from '@services/web3.service';
+import { KeyService } from '@services/key.service';
 
 @Component({
   selector: 'app-erc20',
@@ -18,8 +19,18 @@ export class Erc20Component implements OnInit, OnDestroy {
   private _tokenSubscriptions: Subscription;
 
   constructor(
-    private _erc20Service: Erc20Service
+    private _erc20Service: Erc20Service,
+    private _keyService: KeyService,
+    private _web3Service: Web3Service
   ) {
+  }
+
+  private get nodeAddress(): string {
+    return this._web3Service.nodeAddress;
+  }
+
+  private get publicKey(): string {
+    return this._keyService.getAddress();
   }
 
   private addToken() {

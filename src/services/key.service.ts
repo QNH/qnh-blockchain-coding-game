@@ -32,17 +32,17 @@ export class KeyService {
 
   getAddress(): string {
     this.forceExistance();
-    return this._account.address;
+    return this.account.address;
   }
 
   getPublicKey(): string {
     this.forceExistance();
-    return this._account.publicKey;
+    return this.account.publicKey;
   }
 
   getPrivateKey(): string {
     this.forceExistance();
-    return this._account.privateKey;
+    return this.account.privateKey;
   }
 
   get isPrivateKeySet(): boolean {
@@ -66,6 +66,6 @@ export class KeyService {
 
   public async setPrivateKey(privateKey: string): Promise<void> {
     this._privateKey = privateKey;
-    localStorage.setItem(this.storageKey, this._account.privateKey);
+    localStorage.setItem(this.storageKey, this.account.privateKey);
   }
 }
