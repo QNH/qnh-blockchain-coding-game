@@ -1,4 +1,11 @@
-<div>
+<div class= "content">
+  <div class="menu-wrapper">
+    <ul class="menu">
+      <li *ngFor="let menuItem of _menuItems">
+        <a [href]="menuItem.href" *ngIf="shouldShowMenuItem(menuItem)">{{menuItem.label}}</a>
+      </li>
+    </ul>
+  </div>
   <router-outlet></router-outlet>
 </div>
 

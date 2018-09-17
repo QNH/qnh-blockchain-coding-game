@@ -9,7 +9,7 @@ export const environment = {
   gas: 10000000,
   chainId: 3177,
   routes: {
-    part1: '',
+    part1: 'part1',
     part2: 'part2',
     part3: 'part3',
     part4: 'part4',

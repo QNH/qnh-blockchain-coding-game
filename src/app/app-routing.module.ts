@@ -13,6 +13,7 @@ import { Part4ValidationService } from '@services/access/part4-validation.servic
 import { Part5ValidationService } from '@services/access/part5-validation.service';
 
 const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: environment.environment.routes.part1 },
   { path: environment.environment.routes.part1, component: IntroductionComponent, pathMatch: 'full' },
   { path: environment.environment.routes.part2, component: Erc20Component, canActivate: [ Part2ValidationService ] },
   { path: environment.environment.routes.reset, component: ResetComponent }
