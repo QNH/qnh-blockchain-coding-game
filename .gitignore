@@ -2,3 +2,4 @@ node_modules/
 environment.prod.ts
 e2e/
 *.spec.ts
+*.bin
