@@ -5,4 +5,8 @@ export class Part3ValidationService {
 
   constructor() { }
 
+  canActivate(params, routeConfig, navigationInstruction) {
+    return true;
+  }
+
 }

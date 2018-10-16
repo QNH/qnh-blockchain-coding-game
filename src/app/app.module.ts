@@ -16,12 +16,15 @@ import { Part2ValidationService } from '@services/access/part2-validation.servic
 import { Part3ValidationService } from '@services/access/part3-validation.service';
 import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { Part5ValidationService } from '@services/access/part5-validation.service';
+import { Erc721Component } from './erc721/erc721.component';
+import { Erc721Service } from '@services/erc721.service';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     Erc20Component,
+    Erc721Component,
     IntroductionComponent,
     ResetComponent
   ],
@@ -30,7 +33,7 @@ import { Part5ValidationService } from '@services/access/part5-validation.servic
     FormsModule,
     AppRoutingModule
   ],
-  providers: [Erc20Service, KeyService, RouteService, Web3Service,
+  providers: [ Erc20Service, Erc721Service, KeyService, RouteService, Web3Service,
   // Validation services
   Part2ValidationService, Part3ValidationService, Part4ValidationService, Part5ValidationService
 ],

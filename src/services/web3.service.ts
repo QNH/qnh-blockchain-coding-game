@@ -48,6 +48,10 @@ export class Web3Service {
     return new this.web3.eth.Contract(abi, address);
   }
 
+  async getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt> {
+    return await this.web3.eth.getTransactionReceipt(transactionHash);
+  }
+
   get hasNodeAddress(): boolean {
     return !!this.nodeAddress;
   }
@@ -107,8 +111,16 @@ export class Web3Service {
    */
   async sendTransaction(transaction: Object, privateKey: string): Promise<TransactionReceipt> {
     const signature = await this.web3.eth.accounts.signTransaction(transaction, privateKey);
+    let rawTransaction: string;
+    if (typeof(signature) === 'string') {
+      rawTransaction = signature;
+    } else {
+      // @ts-ignore
+      rawTransaction = signature.rawTransaction;
+    }
+    console.log(signature);
     if (!!signature) {
-      return await this.web3.eth.sendSignedTransaction(signature as string);
+      return await this.web3.eth.sendSignedTransaction(rawTransaction);
     } else {
       return null;
     }

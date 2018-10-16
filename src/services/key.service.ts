@@ -30,14 +30,13 @@ export class KeyService {
     }
   }
 
-  getAddress(): string {
+  getAddress(makeLowerCase = false): string {
     this.forceExistance();
-    return this.account.address;
-  }
-
-  getPublicKey(): string {
-    this.forceExistance();
-    return this.account.publicKey;
+    let address = this.account.address;
+    if (makeLowerCase && !!address) {
+      address = address.toLowerCase();
+    }
+    return address;
   }
 
   getPrivateKey(): string {

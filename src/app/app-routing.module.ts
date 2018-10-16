@@ -11,11 +11,13 @@ import { Part2ValidationService } from '@services/access/part2-validation.servic
 import { Part3ValidationService } from '@services/access/part3-validation.service';
 import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { Part5ValidationService } from '@services/access/part5-validation.service';
+import { Erc721Component } from './erc721/erc721.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: environment.environment.routes.part1 },
   { path: environment.environment.routes.part1, component: IntroductionComponent, pathMatch: 'full' },
-  { path: environment.environment.routes.part2, component: Erc20Component, canActivate: [ Part2ValidationService ] },
+  { path: environment.environment.routes.part2, component: Erc20Component, canActivate: [Part2ValidationService] },
+  { path: environment.environment.routes.part3, component: Erc721Component, canActivate: [Part3ValidationService] },
   { path: environment.environment.routes.reset, component: ResetComponent }
 ];
 
@@ -25,6 +27,6 @@ const routes: Routes = [
     RouterModule.forRoot(routes)
   ],
   declarations: [],
-  exports: [ RouterModule ]
+  exports: [RouterModule]
 })
 export class AppRoutingModule { }

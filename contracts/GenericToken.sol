@@ -1,60 +1,58 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.24;
 
 contract GenericToken {
-
-    string private _name;
-    uint private _totalSupply;
-    mapping (address => uint) _balances;
-    mapping (address => mapping(address => uint)) _allowances;
+    bytes public name;
+    uint public totalSupply;
+    mapping (address => uint) private balances;
+    mapping (address => mapping(address => uint)) private allowances;
     uint8 public constant decimals = 18;  // 18 is the most common number of decimal places
 
-
-    constructor(string name, uint totalSupply) public {
-        _name = name;
-        _totalSupply = totalSupply;
-        _balances[msg.sender] = totalSupply;
+    constructor(bytes _name, uint _totalSupply) public {
+        if (_name.length > 0) {
+            name = _name;
+        } else {
+            name = "Generic Token";
+        }
+        if (totalSupply > 0) {
+            totalSupply = _totalSupply;
+        } else {
+            totalSupply = 42000000000000000000000000000000;
+        }
+        balances[msg.sender] = totalSupply;
     }
 
-    function name() public view returns (string) {
-        return _name;
+    function balanceOf(address _tokenOwner) public view returns (uint _balance) {
+        return balances[_tokenOwner];
     }
 
-    function totalSupply() public view returns (uint) {
-        return _totalSupply;
+    function allowance(address _tokenOwner, address _spender) public view returns (uint _remaining) {
+        return allowances[_tokenOwner][_spender];
     }
 
-    function balanceOf(address tokenOwner) public view returns (uint balance) {
-        return _balances[tokenOwner];
-    }
-
-    function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
-        return _allowances[tokenOwner][spender];
-    }
-
-    function transfer(address to, uint tokens) public returns (bool success) {
-        require(_balances[msg.sender] >= tokens);
-        _balances[msg.sender] -= tokens;
-        _balances[to] += tokens;
-        emit Transfer(msg.sender, to, tokens);
+    function transfer(address _to, uint _tokens) public returns (bool _success) {
+        require(balances[msg.sender] >= _tokens, "Not enough funds");
+        balances[msg.sender] -= _tokens;
+        balances[_to] += _tokens;
+        emit Transfer(msg.sender, _to, _tokens);
         return true;
     }
 
-    function approve(address spender, uint tokens) public returns (bool success) {
-        require(_allowances[msg.sender][spender] + _balances[msg.sender] >= tokens);
-        _balances[msg.sender] -= (tokens - _allowances[msg.sender][spender]);
-        _allowances[msg.sender][spender] = tokens;
-        emit Approval(msg.sender, spender, tokens);
+    function approve(address _spender, uint _tokens) public returns (bool _success) {
+        require(allowances[msg.sender][_spender] + balances[msg.sender] >= _tokens, "Not enough funds");
+        balances[msg.sender] -= (_tokens - allowances[msg.sender][_spender]);
+        allowances[msg.sender][_spender] = _tokens;
+        emit Approval(msg.sender, _spender, _tokens);
         return true;
     }
 
-    function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        require(_allowances[from][msg.sender] >= tokens);
-        _allowances[from][msg.sender] -= tokens;
-        _balances[to] += tokens;
-        emit Transfer(from, to, tokens);
+    function transferFrom(address _from, address _to, uint _tokens) public returns (bool _success) {
+        require(allowances[_from][msg.sender] >= _tokens, "No enought funds");
+        allowances[_from][msg.sender] -= _tokens;
+        balances[_to] += _tokens;
+        emit Transfer(_from, _to, _tokens);
         return true;
     }
 
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+    event Transfer(address indexed _from, address indexed _to, uint _tokens);
+    event Approval(address indexed _tokenOwner, address indexed _spender, uint _tokens);
 }
