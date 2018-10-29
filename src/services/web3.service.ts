@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-// @ts-ignore
-import * as Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
+import Web3 from 'web3';
 import Contract from 'web3/eth/contract';
 import { Account } from 'web3/eth/accounts';
 import { CanActivate } from '@angular/router';
@@ -15,7 +14,7 @@ export class Web3Service {
 
   constructor() { }
 
-  private get web3(): Web3 {
+  private get web3(): any {
     if (!this.hasNodeAddress) {
       const nodeAddress = localStorage.getItem(this.nodeAddressStorageKey);
       if (!!nodeAddress) {
@@ -48,12 +47,30 @@ export class Web3Service {
     return new this.web3.eth.Contract(abi, address);
   }
 
+  async getLatestBlockNumber(): Promise<number> {
+    return this.web3.eth.getBlockNumber();
+  }
+
   async getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt> {
     return await this.web3.eth.getTransactionReceipt(transactionHash);
   }
 
   get hasNodeAddress(): boolean {
     return !!this.nodeAddress;
+  }
+
+  isNullOrInvalidAddress(address: string): boolean {
+    if (!address || !address.length || address.length !== 42) {
+      console.log('invalid length: ' + address);
+      return false;
+    }
+    try {
+      const bigNumber = this.web3.utils.toBN(address);
+      return bigNumber.eqn(0);
+    } catch (e) {
+      // Not a valid address
+      return true;
+    }
   }
 
   async isValidNode(nodeAddress: string): Promise<boolean> {
@@ -112,7 +129,7 @@ export class Web3Service {
   async sendTransaction(transaction: Object, privateKey: string): Promise<TransactionReceipt> {
     const signature = await this.web3.eth.accounts.signTransaction(transaction, privateKey);
     let rawTransaction: string;
-    if (typeof(signature) === 'string') {
+    if (typeof (signature) === 'string') {
       rawTransaction = signature;
     } else {
       // @ts-ignore

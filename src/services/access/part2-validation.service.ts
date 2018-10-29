@@ -38,11 +38,14 @@ export class Part2ValidationService implements CanActivate {
     }
    }
 
-  canActivate(): boolean {
+   // @ts-ignore
+  canActivate(redirectOnFalse: boolean = true): boolean {
     if (this._keyService.isPrivateKeySet && this._web3Service.hasNodeAddress) {
       return true;
-    } else {
+    } else if (redirectOnFalse) {
       this._routeService.navigateToPart1();
+    } else {
+      return false;
     }
   }
 

@@ -1,12 +1,49 @@
 /* You can add global styles to this file, and also import other style files */
 
+body {
+  margin: 0;
+  display: block;
+  position: relative;
+}
+
 * {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+  font-family: Arial, Helvetica, sans-serif
+}
+
+h1 {
+  font-size: 26px;
+  color: rgb(19, 34, 72);
+}
+
+h2, h3, h4 {
+  color: rgb(168, 113, 43);
+}
+
+p, li {
+  line-height: 22px;
+  font-size: 16px;
+}
+
+.code, .snippet {
+  font-family: 'Courier New', Courier, monospace;
+  background: #CCF;
+  line-height: 24px;
+  font-size: 14px;
 }
 
 .code {
-  font-family: 'Courier New', Courier, monospace;
-  background: #CCF;
-  font-size: 12px;
   padding: 0 4px;
+}
+
+.snippet {
+  display: inline-block;
+  padding: 8px 14px;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
 }

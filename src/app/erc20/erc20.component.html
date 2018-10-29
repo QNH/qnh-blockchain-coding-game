@@ -87,17 +87,17 @@
   </ul>
   <p>
     All of that combined should result in a JavaScript object looking like this:
-    <span class="code"><br>
-      &nbsp;&nbsp;{{ "{" }}<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;from: {{publicKey}},<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;to: 0x88e94A4b7BfC62A38D300d98ce1C09f30fb75e3E,<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;nonce: 0x04,<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;gas: 4700000,<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;gasPrice: 1,<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;value: web3.toWei(1, 'Ether')<br>
-      &nbsp;&nbsp;{{"}"}}
-    </span>
   </p>
+  <div class="snippet">
+    &nbsp;&nbsp;{{ "{" }}<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;from: {{publicKey}},<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;to: 0x88e94A4b7BfC62A38D300d98ce1C09f30fb75e3E,<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;nonce: 0x04,<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;gas: 4700000,<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;gasPrice: 1,<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;value: web3.toWei(1, 'Ether')<br />
+    &nbsp;&nbsp;{{ "}" }}
+  </div>
   <p>
     There is however a significant difference between calls and transactions. Every change on Ethereum is checked and
     can only be done by the owner of a private key. In order to proof that someone is the actual owner of a key, that
@@ -275,38 +275,37 @@
     </p>
   </div>
 </div>
-  <table class="tokens" *ngIf="step4Completed">
-    <tr *ngFor="let token of _tokens" [attr.data-address]="token.address">
-      <td>
-        <input type="radio" [(ngModel)]="_currentToken" [value]="token" />
-      </td>
-      <td>
-        {{token.name}}
-      </td>
-      <td>
-        {{token.balance}}
-      </td>
-    </tr>
-  </table>
-  <table class="form" *ngIf="!!_currentToken">
-    <tr>
-      <td>Amount</td>
-      <td><input [(ngModel)]="_transferAmount" /></td>
-    </tr>
-    <tr>
-      <td>To</td>
-      <td><input [(ngModel)]="_transferTo" /></td>
-    </tr>
-    <tr>
-      <td colspan="2">
-        <button (click)="transfer(_currentToken.address)">Transfer</button>
-      </td>
-    </tr>
-    <tr *ngIf="step4Completed">
-      <td>
-        <input [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
-        <button (click)="addToken()">Add token</button>
-      </td>
-    </tr>
-  </table>
-
+<table class="tokens" *ngIf="step4Completed">
+  <tr *ngFor="let token of _tokens" [attr.data-address]="token.address">
+    <td>
+      <input type="radio" [(ngModel)]="_currentToken" [value]="token" />
+    </td>
+    <td>
+      {{token.name}}
+    </td>
+    <td>
+      {{token.balance}}
+    </td>
+  </tr>
+</table>
+<table class="form" *ngIf="!!_currentToken">
+  <tr>
+    <td>Amount</td>
+    <td><input [(ngModel)]="_transferAmount" /></td>
+  </tr>
+  <tr>
+    <td>To</td>
+    <td><input [(ngModel)]="_transferTo" /></td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <button (click)="transfer(_currentToken.address)">Transfer</button>
+    </td>
+  </tr>
+  <tr *ngIf="step4Completed">
+    <td>
+      <input [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
+      <button (click)="addToken()">Add token</button>
+    </td>
+  </tr>
+</table>

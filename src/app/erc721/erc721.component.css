@@ -1,0 +1,54 @@
+
+#erc721-application {
+  border: 1px solid #004e98;
+  height: 900px;
+  overflow-y: scroll;
+  position: relative;
+}
+
+.application-overlay {
+  position: absolute;
+  background-color: rgba(0,0,0,0.3);
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  z-index: 1;
+}
+
+.application-overlay-background {
+  position: relative;
+}
+
+.application-overlay .form {
+  background: #FFFFFF;
+  padding: 12px 20px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px 0 rgba(0,0,0,0.9);
+  margin: 20px auto;
+}
+
+.application-overlay .add-plot-submit {
+  height: 50px;
+  padding-top: 20px;
+}
+
+.application-overlay .add-plot-submit img {
+  max-height: 50px;
+}
+
+.application-wrapper {
+  height: 100%;
+  z-index: 0;
+  vertical-align: top;
+}
+
+.application-content {
+  height: 100%;
+  vertical-align: top;
+}
+
+.application-footer {
+  vertical-align: top;
+}
+

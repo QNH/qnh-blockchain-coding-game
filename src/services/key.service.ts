@@ -20,28 +20,24 @@ export class KeyService {
     return this._account;
   }
 
-  forceExistance(): void {
-    if (!this._account) {
-      let privateKey = localStorage.getItem(this.storageKey);
-      while (!privateKey || !privateKey.length) {
-        privateKey = window.prompt('Er is nog geen keypair gevonden. Welke private key wil je gebruiken?');
-      }
-      this.setPrivateKey(privateKey);
-    }
-  }
-
   getAddress(makeLowerCase = false): string {
-    this.forceExistance();
-    let address = this.account.address;
-    if (makeLowerCase && !!address) {
-      address = address.toLowerCase();
+    if (this.hasAccount) {
+      let address = this.account.address;
+      if (makeLowerCase && !!address) {
+        address = address.toLowerCase();
+      }
+      return address;
+    } else {
+      return undefined;
     }
-    return address;
   }
 
   getPrivateKey(): string {
-    this.forceExistance();
-    return this.account.privateKey;
+    return this.hasAccount ? this.account.privateKey : undefined;
+  }
+
+  get hasAccount(): boolean {
+    return !!this.account;
   }
 
   get isPrivateKeySet(): boolean {

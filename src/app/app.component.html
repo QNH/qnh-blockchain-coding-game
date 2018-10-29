@@ -1,11 +1,15 @@
-<div class= "content">
+<div class="content">
   <div class="menu-wrapper">
-    <ul class="menu">
-      <li *ngFor="let menuItem of _menuItems">
-        <a [href]="menuItem.href" *ngIf="shouldShowMenuItem(menuItem)">{{menuItem.label}}</a>
-      </li>
-    </ul>
+    <table class="menu" *ngIf="shouldShowMenu()">
+      <tr>
+        <td [hidden]="!shouldShowMenuItem(menuItem)" *ngFor="let menuItem of _menuItems" class="menu-item" [ngClass]="{'active': isActive(menuItem)}">
+          <a [href]="menuItem.href">{{menuItem.label}}</a>
+        </td>
+      </tr>
+    </table>
   </div>
-  <router-outlet></router-outlet>
+  <img src="/assets/images/banner.jpg" class="banner" />
+  <div id="body">
+    <router-outlet></router-outlet>
+  </div>
 </div>
-
