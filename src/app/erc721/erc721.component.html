@@ -26,102 +26,130 @@
   <li>when a plot gets up for sale (or the price changes), a PlotForSale event should trigger with the identifier and
     the new price of the plot.</li>
 </ul>
-<p>
-  After editing the contract so it meets the requirements, you have to create the communication between this
-  application and the contract. This is done is the Erc721Service found in <span class="code">/src/services/erc721.service.ts</span>.
-  The method headers have already been estabilished.
-</p>
-<p>
-  The part below is part of the client dashboard provided by the coworker web developers. Your task is to make it work
-  with your developed smart contract.
-</p>
-<div id="erc721-application">
-  <div class="application-overlay" *ngIf="!!_addPlotFormData">
-    <div class="application-overlay-background">
-      <table class="form add-plot">
-        <tr>
-          <td colspan="2">
-            <h3>
-              Add plot
-            </h3>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Name
-          </td>
-          <td>
-            <input type="text" [(ngModel)]="_addPlotFormData.name" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Symbol
-          </td>
-          <td>
-            <input type="text" [(ngModel)]="_addPlotFormData.symbol" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Price
-          </td>
-          <td>
-            <input type="number" [(ngModel)]="_addPlotFormData.price" />
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" class="add-plot-submit" [class.right]="!_addPlotLoading" [class.center]="_addPlotLoading">
-            <button (click)="closeAddPlot()" *ngIf="!_addPlotLoading">
-              Close
-            </button>
-            <button (click)="submitAddPlot(_addPlotFormData)" *ngIf="!_addPlotLoading">
-              Add plot
-            </button>
-            <img *ngIf="_addPlotLoading" src="/assets/images/application-loader.gif" />
-          </td>
-        </tr>
-      </table>
-    </div>
+<div *ngIf="!hasErc721Contract">
+  <p>
+    Edit to contract to match these requirements. The headers of the functions are already there and may not change.
+    You can deploy a new ERC721 contract using the button below. The button will paste your clipboard in the browser
+    and deploy the contents of your clipboard. This will result in an address. This page will consider any contract as
+    an ERC721 contract.
+  </p>
+</div>
+<div *ngIf="hasErc721Contract()">
+  <p>
+    After editing the contract so it meets the requirements and deploying it, you have to create the communication
+    between this
+    application and the contract. This is done is the Erc721Service found in <span class="code">/src/services/erc721.service.ts</span>.
+    The method headers have already been estabilished. If it turns out your made a mistake in your contract and you
+    want to make a change, you have to recompile and redeploy the entire contract, meaning you'll get a new address. At
+    the bottom of the page, you will always be able to deploy a contract again, as long as you have the binary code on
+    your clipboard.
+  </p>
+  <div *ngIf="!hasCreatedErc721Token()">
+    <p>
+      For a start, make sure you are able to create an ERC721 token.
+    </p>
+    <p><span class="bonus">BONUS! </span> Make it so that the name and symbol parts of the form are used. The site can
+      already process them - if done right.</p>
   </div>
-  <table class="application-wrapper">
-    <tr class="application-header">
-      <td>
-        <h3>
-          Plot Manager Plus
-        </h3>
-      </td>
-    </tr>
-    <tr class="application-content">
-      <td>
-        <!-- If all is well, you should be able to just remove the following line and fix the code for retrieving the data. The display of data is already done -->
-        <span class="todo">// Todo This should be a list of plots for sale</span>
-        <table class="application-plots">
-          <tr *ngFor="let 'plot' of _plots | async">
-            <td class="application-plot">
-              <table>
-                <tr>
-                  <td colspan="2" class="plot-name">
-                    {{ !!plot.name && !!plot.name.length ? plot.name : plot.id }}
-                  </td>
-                </tr>
-              </table>
+  <div *ngIf="hasCreatedErc721Token() && !hasPurchasedErc721Token()">
+    <p>
+      Now that your ERC721 contract has a token, you can try to purchase it, or let anyone around you purchase it.
+    </p>
+  </div>
+  <p>
+    The part below is part of the client dashboard provided by the coworker web developers. Your task is to make it
+    work with your developed smart contract.
+  </p>
+  <div id="erc721-application" class="application-window">
+    <div class="application-overlay" *ngIf="!!_addPlotFormData">
+      <div class="application-overlay-background">
+        <table class="application-window form add-plot">
+          <tr>
+            <td class="application-topbar" colspan="2">
+              <h3>
+                Add plot
+              </h3>
+              <div (click)="closeAddPlot()" class="button">
+                X
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Name
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="_addPlotFormData.name" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Symbol
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="_addPlotFormData.symbol" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Price
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="_addPlotFormData.price" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" class="add-plot-submit" [class.right]="!_addPlotLoading" [class.center]="_addPlotLoading">
+              <button (click)="submitAddPlot(_addPlotFormData)" *ngIf="!_addPlotLoading">
+                Add plot
+              </button>
+              <img *ngIf="_addPlotLoading" src="/assets/images/application-loader.gif" />
             </td>
           </tr>
         </table>
-      </td>
-    </tr>
-    <tr class="application-footer">
-      <td>
-        <button (click)="openAddPlot()">New plot</button>
-      </td>
-    </tr>
-  </table>
+      </div>
+    </div>
+    <table class="application-wrapper">
+      <tr class="application-header">
+        <td class="application-topbar">
+          <h3>
+            Plot Manager Plus
+          </h3>
+        </td>
+      </tr>
+      <tr class="application-content">
+        <td>
+          <!-- If all is well, you should be able to just remove the following line and fix the code for retrieving the data. The display of data is already done -->
+          <span class="todo">// Todo This should be a list of plots for sale</span>
+          <table class="application-plots">
+            <tr *ngFor="let 'plot' of _plots | async">
+              <td class="application-plot">
+                <table>
+                  <tr>
+                    <td colspan="2" class="plot-name">
+                      {{ !!plot.name && !!plot.name.length ? plot.name : plot.id }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr class="application-footer">
+        <td>
+          <button (click)="openAddPlot()">New plot</button>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
-<div *ngIf="!_deploymentLoading">
-  <p (click)="deployClipboard()">Deploy contract from clipboard</p>
-  <p *ngIf="!!_deployedContract && !!_deployedContract.length">
-    Last deployed contract address: {{_deployedContract}}
-  </p>
+<div class="deployment-helper">
+  <div *ngIf="!_deploymentLoading">
+    <p (click)="deployClipboard()">Deploy contract from clipboard</p>
+    <p *ngIf="!!_erc721Address && !!_erc721Address.length">
+      Last deployed contract address: {{_erc721Address}}
+    </p>
+  </div>
+  <p *ngIf="_deploymentLoading">Loading...</p>
 </div>
-<p *ngIf="_deploymentLoading">Loading...</p>

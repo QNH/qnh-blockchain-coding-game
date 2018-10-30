@@ -3,7 +3,6 @@ import { CanActivate } from '@angular/router';
 import { Web3Service } from '@services/web3.service';
 import { KeyService } from '@services/key.service';
 import { RouteService } from '@services/route.service';
-import { TransactionReceipt } from 'web3/types';
 import { Erc20Service } from '@services/erc20.service';
 
 @Injectable()

@@ -19,6 +19,7 @@ import { Part5ValidationService } from '@services/access/part5-validation.servic
 import { Erc721Component } from './erc721/erc721.component';
 import { Erc721Service } from '@services/erc721.service';
 import { DeploymentService } from '@services/deployment.service';
+import { MenuService } from '@services/menu.service';
 
 
 @NgModule({
@@ -34,7 +35,7 @@ import { DeploymentService } from '@services/deployment.service';
     FormsModule,
     AppRoutingModule
   ],
-  providers: [ DeploymentService, Erc20Service, Erc721Service, KeyService, RouteService, Web3Service,
+  providers: [ DeploymentService, Erc20Service, Erc721Service, KeyService, MenuService, RouteService, Web3Service,
   // Validation services
   Part2ValidationService, Part3ValidationService, Part4ValidationService, Part5ValidationService
 ],

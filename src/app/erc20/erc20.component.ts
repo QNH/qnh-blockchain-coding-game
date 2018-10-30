@@ -7,6 +7,7 @@ import { CanActivate } from '@angular/router';
 import { Web3Service } from '@services/web3.service';
 import { KeyService } from '@services/key.service';
 import { Part2ValidationService } from '@services/access/part2-validation.service';
+import { MenuService } from '@services/menu.service';
 
 @Component({
   selector: 'app-erc20',
@@ -30,6 +31,7 @@ export class Erc20Component implements OnInit, OnDestroy {
   constructor(
     private _erc20Service: Erc20Service,
     private _keyService: KeyService,
+    private _menuService: MenuService,
     private _partValidator: Part2ValidationService,
     private _web3Service: Web3Service
   ) {
@@ -114,6 +116,7 @@ export class Erc20Component implements OnInit, OnDestroy {
               if (!this.step4Completed) {
                 this._currentToken.balance = await this._erc20Service.getBalanceOf(this._currentToken.address);
                 this._partValidator.submitTokenTransferHash(event.transactionHash);
+                this._menuService.syncMenuItems();
                 this._erc20Service.addToken(token);
               }
             });

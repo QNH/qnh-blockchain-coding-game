@@ -1,8 +1,8 @@
 <div class="content">
   <div class="menu-wrapper">
-    <table class="menu" *ngIf="shouldShowMenu()">
+    <table class="menu" *ngIf="_shouldShowMenu">
       <tr>
-        <td [hidden]="!shouldShowMenuItem(menuItem)" *ngFor="let menuItem of _menuItems" class="menu-item" [ngClass]="{'active': isActive(menuItem)}">
+        <td *ngFor="let menuItem of _menuItems | async" class="menu-item" [ngClass]="{'active': isActive(menuItem)}">
           <a [href]="menuItem.href">{{menuItem.label}}</a>
         </td>
       </tr>
