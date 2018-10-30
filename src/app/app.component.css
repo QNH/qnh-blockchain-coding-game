@@ -1,0 +1,52 @@
+
+.content {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+#body {
+  width: 80%;
+  min-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+}
+
+.menu {
+  border: 0;
+  border-spacing: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  table-layout: fixed;
+}
+
+.menu-item {
+  border: 0;
+  text-align: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: #CCCCCC;
+  transition: background-color 200ms ease;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #CC3399;
+}
+
+.menu-item a {
+  line-height: 34px;
+  color: #FFFFFF;
+  text-decoration: none;
+  display: block;
+}
+
+.active {
+  background: rgb(19, 34, 72);
+}
+
+.banner {
+  width: 100%;
+}
