@@ -135,7 +135,6 @@ export class Web3Service {
       // @ts-ignore
       rawTransaction = signature.rawTransaction;
     }
-    console.log(signature);
     if (!!signature) {
       return await this.web3.eth.sendSignedTransaction(rawTransaction);
     } else {

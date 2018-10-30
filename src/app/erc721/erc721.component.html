@@ -122,15 +122,39 @@
           <!-- If all is well, you should be able to just remove the following line and fix the code for retrieving the data. The display of data is already done -->
           <span class="todo">// Todo This should be a list of plots for sale</span>
           <table class="application-plots">
-            <tr *ngFor="let 'plot' of _plots | async">
+            <tr *ngFor="let plot of _plots | async">
               <td class="application-plot">
-                <table>
+                <table class="application-plot-info">
                   <tr>
-                    <td colspan="2" class="plot-name">
+                    <td class="plot-name">
                       {{ !!plot.name && !!plot.name.length ? plot.name : plot.id }}
+                    </td>
+                    <td class="plot-symbol">
+                      {{ plot.symbol }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      {{ plot.ownerAddress }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="plotForSale(plot)">
+                    <td class="plot-price" colspan="2">
+                      Price: {{ plot.price }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="plotForSale(plot)">
+                    <td colspan="2" class="button-wrapper">
+                      <button (click)="purchasePlot(plot)">Purchase this plot</button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!plotForSale(plot)">
+                    <td colspan="3">
+                      Not for sale
                     </td>
                   </tr>
                 </table>
+                <div class="seperator">&nbsp;</div>
               </td>
             </tr>
           </table>

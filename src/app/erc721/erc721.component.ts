@@ -78,6 +78,20 @@ export class Erc721Component implements OnInit {
     this._addPlotFormData = new CreateErc721TokenFormData();
   }
 
+  private plotForSale(plot: Plot): boolean {
+    return (plot.price > 0);
+  }
+
+  private async purchasePlot(plot: Plot): Promise<void> {
+    const receipt = await this._erc721Service.purchasePlot(plot);
+    if (receipt !== false && !!receipt.status) {
+      alert('Success!');
+      this._erc721Service.synchronizePlots();
+    } else {
+      alert('Failure');
+    }
+  }
+
   private async submitAddPlot(plot: CreateErc721TokenFormData): Promise<void> {
     this._addPlotLoading = true;
     this._erc721Service.createPlot(plot).then(() => {
