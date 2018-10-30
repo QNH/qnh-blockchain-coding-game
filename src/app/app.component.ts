@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import * as environment from '@environments/environment';
+import { MenuService, MenuItem } from '@services/menu.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -7,21 +8,21 @@ import * as environment from '@environments/environment';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  private _menuItems: MenuItem[] = [
-    { href: environment.environment.routes.part1, label: 'Task 1: Introduction' },
-    { href: environment.environment.routes.part2, label: 'Task 2: ERC20 Token' },
-    { href: environment.environment.routes.part3, label: 'Task 3: ERC721 Asset' },
-    { href: environment.environment.routes.part4, label: 'Task 4: ???' },
-    { href: environment.environment.routes.part5, label: 'Task 5: ???' },
-  ];
+  private _menuItems: Observable<MenuItem[]>;
+  private _shouldShowMenu = false;
 
-  private shouldShowMenuItem(menuItem: MenuItem): boolean {
-    return true;
+  constructor(
+    private _menuService: MenuService
+  ) {
+    this._menuItems = this._menuService.getMenuItems();
+    this._shouldShowMenu = this._menuService.shouldShowMenu();
+    this._menuItems.subscribe(() => {
+      this._shouldShowMenu = this._menuService.shouldShowMenu();
+    });
+  }
+
+  private isActive(menuItem: MenuItem): boolean {
+    return this._menuService.isActive(menuItem);
   }
 }
 
-
-class MenuItem {
-  href: string;
-  label: string;
-}

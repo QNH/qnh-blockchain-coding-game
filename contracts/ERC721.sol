@@ -7,10 +7,11 @@ contract ERC721 /* is ERC165 */ {
 
   mapping(address => mapping (uint256 => address)) allowed;
   mapping(address => mapping (address => bool)) allowedForAll;
-  mapping(address => uint256) balances;
-  mapping(uint => address) metadata;
+  mapping(uint256 => address) public metadata;
   address owner = msg.sender;
-  mapping(uint256 => address) tokens;
+  mapping(address => uint256) public tokenBalances;
+  mapping(uint256 => uint256) public tokenPrices;
+  mapping(uint256 => address) public tokens;
   uint256 public totalSupply = 0;
 
   modifier requireNotNull(address _operator) {
@@ -19,7 +20,7 @@ contract ERC721 /* is ERC165 */ {
   }
 
   modifier validateOperator(address _operator, uint256 _tokenId) {
-    require(this.ownerOf(_tokenId) == _operator, "operator is no owner of token");
+    require(this.ownerOf(_tokenId) == _operator, "Operator is no owner of token");
     _;
   }
 
@@ -47,6 +48,8 @@ contract ERC721 /* is ERC165 */ {
   ///  The operator can manage all NFTs of the owner.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
+  event PlotForSale(uint256 indexed _tokenId, uint256 price);
+
   /// @notice Change or reaffirm the approved address for an NFT
   /// @dev The zero address indicates there is no approved address.
   ///  Throws unless `msg.sender` is the current NFT owner, or an authorized
@@ -65,7 +68,7 @@ contract ERC721 /* is ERC165 */ {
   /// @param _owner An address for whom to query the balance
   /// @return The number of NFTs owned by `_owner`, possibly zero
   function balanceOf(address _owner) external view returns (uint256) {
-    return balances[_owner];
+    return tokenBalances[_owner];
   }
 
   /// @notice Get the approved address for a single NFT
@@ -129,24 +132,46 @@ contract ERC721 /* is ERC165 */ {
 
   /// Custom implementation for management purposes
 
-  function addBalance(address _owner) private {
-    balances[_owner] += 1;
+  /// @dev This function is called when a person sends Ether to the contract
+  /// without any data (or when the data describes a function that does not
+  /// exist). Basically, this is the fallback function of the contract.
+  /// The require is there to assure this function is only called to up
+  /// the Ether balance of a sender
+  function() public payable {
+    require (msg.value > 0, "Fallback function with no value");
+    // Add Ether balance to msg.sender
   }
 
-  function createToken(address _owner, address _metadata) external payable {
+  /// @dev Add token balance of a person. This is just a helper function
+  /// for clarity. Note that this does NOT up the Ether balance of a user.
+  function addBalance(address _owner) private {
+    tokenBalances[_owner] += 1;
+  }
+
+  function createToken(uint _price, address _metadata) external payable {
     require (owner == msg.sender, "Only the contract deployer can create tokens");
-    uint256 newId = ++totalSupply;
-    tokens[newId] = _owner;
-    addBalance(_owner);
+    uint256 newId = totalSupply;
+    tokens[newId] = msg.sender;
+    addBalance(tokens[newId]);
+    tokenPrices[newId] = _price;
     if (_metadata != address(0)) {
       metadata[newId] = _metadata;
     }
-    emit Transfer(address(0), _owner, newId);
+    totalSupply += 1;
+    emit Transfer(address(0), tokens[newId], newId);
+  }
+
+  function purchase(uint256 _tokenId) public payable {
+    require (msg.value >= tokenPrices[_tokenId], "Not enough funds to purchase token");
+    tokens[_tokenId].transfer(msg.value);
+    removeBalance(tokens[_tokenId]);
+    tokens[_tokenId] = msg.sender;
+    addBalance(tokens[_tokenId]);
   }
 
   function removeBalance(address _owner) private {
-    require(balances[_owner] > 0);
-    balances[_owner] -= 1;
+    require(tokenBalances[_owner] > 0);
+    tokenBalances[_owner] -= 1;
   }
 
   /// @notice Not implemented for the exercise, but are in essence required as of ERC721!
