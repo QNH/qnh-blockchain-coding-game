@@ -8,6 +8,9 @@ import { Erc20Service } from '@services/erc20.service';
 @Injectable()
 export class Part2ValidationService implements CanActivate {
 
+  private _hasEtherBalance: boolean;
+  private readonly HasEtherBalanceStorageKey = 'bcg_ether_has_balance';
+
   private _etherTransactionHash: string;
   private readonly EtherTransactionHashStorageKey = 'bcg_ether_transaction_hash';
 
@@ -23,6 +26,8 @@ export class Part2ValidationService implements CanActivate {
     private _routeService: RouteService,
     private _web3Service: Web3Service
   ) {
+    const hasEtherBalance = localStorage.getItem(this.HasEtherBalanceStorageKey);
+    this._hasEtherBalance = !!hasEtherBalance;
     const etherTransactionHash = localStorage.getItem(this.EtherTransactionHashStorageKey);
     if (!! etherTransactionHash) {
       this._etherTransactionHash = etherTransactionHash;
@@ -71,6 +76,10 @@ export class Part2ValidationService implements CanActivate {
     return false;
   }
 
+  get hasDoneEtherBalance(): boolean {
+    return this._hasEtherBalance;
+  }
+
   get hasDoneEtherTransaction(): boolean {
     return !!this._etherTransactionHash;
   }
@@ -88,12 +97,19 @@ export class Part2ValidationService implements CanActivate {
   }
 
   reset(): void {
+    this._hasEtherBalance = false;
     this._etherTransactionHash = '';
     this._tokenTransactionHash = '';
     this._tokenTransferHash = '';
+    localStorage.setItem(this.HasEtherBalanceStorageKey, 'false');
     localStorage.setItem(this.EtherTransactionHashStorageKey, this._etherTransactionHash);
     localStorage.setItem(this.TokenTransactionHashStorageKey, this._tokenTransactionHash);
     localStorage.setItem(this.TokenTransferHashStorageKey, this._tokenTransferHash);
+  }
+
+  setHasEtherBalance(has: boolean): void {
+    this._hasEtherBalance = has;
+    localStorage.setItem(this.HasEtherBalanceStorageKey, has + '');
   }
 
   submitEtherTransactionHash(transactionHash: string): void {

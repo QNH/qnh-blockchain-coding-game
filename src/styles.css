@@ -68,3 +68,9 @@ input.private-key {
 input.address {
   width: 300px;
 }
+
+.input-error {
+  color: red;
+  font-style: italic;
+  margin-bottom: 20px;
+}

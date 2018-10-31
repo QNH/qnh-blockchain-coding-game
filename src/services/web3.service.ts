@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import Contract from 'web3/eth/contract';
 import { Account } from 'web3/eth/accounts';
 import { CanActivate } from '@angular/router';
+import { environment } from '@environments/environment';
 
 @Injectable()
 export class Web3Service {
@@ -14,7 +15,7 @@ export class Web3Service {
 
   constructor() { }
 
-  private get web3(): any {
+  private get web3(): Web3 {
     if (!this.hasNodeAddress) {
       const nodeAddress = localStorage.getItem(this.nodeAddressStorageKey);
       if (!!nodeAddress) {
@@ -31,6 +32,7 @@ export class Web3Service {
 
   getAccountByPrivateKey(privateKey: string): Account {
     try {
+      // @ts-ignore
       return this.web3.eth.accounts.privateKeyToAccount(privateKey);
     } catch (e) {
       return null;
@@ -45,6 +47,18 @@ export class Web3Service {
    */
   async getContract(abi: any[], address: string = null): Promise<Contract> {
     return new this.web3.eth.Contract(abi, address);
+  }
+
+  /**
+   *Get the Ether balance of an account
+   *
+   * @param string The address of the account to check the Ether balance of
+   * @returns The Ether balance in Wei
+   * @memberof Web3Service
+   */
+  public async getEtherBalance(address: string): Promise<number> {
+    // Number of expected lines: 1
+    return this.web3.eth.getBalance(address);
   }
 
   async getLatestBlockNumber(): Promise<number> {
@@ -127,7 +141,11 @@ export class Web3Service {
    * @param privateKey The private key to sign with
    */
   async sendTransaction(transaction: Object, privateKey: string): Promise<TransactionReceipt> {
+    // Must use web3.eth.accounts.signTransaction
+    // Can not use web3.eth.signTranscation
     const signature = await this.web3.eth.accounts.signTransaction(transaction, privateKey);
+
+    // signature can be an object or a string.
     let rawTransaction: string;
     if (typeof (signature) === 'string') {
       rawTransaction = signature;
@@ -135,7 +153,9 @@ export class Web3Service {
       // @ts-ignore
       rawTransaction = signature.rawTransaction;
     }
+
     if (!!signature) {
+      // Send signed transaction
       return await this.web3.eth.sendSignedTransaction(rawTransaction);
     } else {
       return null;
@@ -145,6 +165,23 @@ export class Web3Service {
   setNodeAddress(nodeAddress: string) {
     this._nodeAddress = nodeAddress;
     localStorage.setItem(this.nodeAddressStorageKey, this._nodeAddress);
+  }
+
+  public async transferEther(from: string, to: string, amount: number, privateKey: string): Promise<TransactionReceipt> {
+    const nonce = await this.web3.eth.getTransactionCount(from);
+    const transaction = {
+      from: from,
+      to: to,
+      amount: amount,
+      nonce: nonce,
+      gas: environment.gas,
+      gasPrice: environment.gasPrice,
+      chainId: environment.chainId
+    };
+    // sendTransaction needs more help in order to actually sign the transation.
+    // If using Visual Studio Code, ctrl-click on sendTransaction below will
+    // direct you to the declaration of the method
+    return this.sendTransaction(transaction, privateKey);
   }
 
 }

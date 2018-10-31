@@ -5,7 +5,7 @@
   data from those.
 </p>
 <div>
-  <h2>Step 1/3: making transactions</h2>
+  <h2>Step 1/3: get your balance</h2>
   <p>
     We'll start with the first of those: making a transaction. For this, it is useful to know how you communicate with
     Ethereum. You can communicate in three ways: making a transaction, calling a contract method and listen to events.
@@ -26,36 +26,68 @@
     be paid to the miner.
   </p>
   <p>
-    The first exercize of this page, it to check our own Ether balance. Next, we will make a transaction by sending
+    The first exercize of this page, it to check our own Ether balance. After that, we will make a transaction by
+    sending
     some
     Ether to someone else. We will cover Events in a later exercize. After sending some Ether, we will deploy our first
     smart contract and learn how to interact with that.
   </p>
-  <p>To start interacting with the Ethereum node, open a console window. In this, execute <span class="code">geth
-      attach {{nodeAddress}}</span> to connect with the Ethereum node you submitted before. This will not make you a
-    node, but instead allows you to use the given node as a sort of API. This will open in form of a JavaScript command
-    console, which can be used to execute Javascript code. Both this console, as this web application use a node module
-    called Web3js to interact with Ethereum. We will later cover how this node module can be used in a web application.
-    For now, it is good to know that this console has access to several modules of its own.
+  <p>
+    Interacting with an Ethereum node in Javascript is done via a module called Web3. Web3 is available in many
+    languages, for those interested in continuening to work with it after this workshop, but for this workshop, we will
+    focus on Web3JS, for Javascript.
   </p>
   <p>
-    The most import one is the <span class="code">eth</span> interface, which is used to interact with the Ethereum
-    functions. The first of those function we are going to use is <span class="code">eth.getBalance</span>. This
-    function
-    will accept two parameters. The first one is the mandatory account address, which you can find in the top right
-    corner of the site. The second one is an optional callback. Many functions of Ethereum are asynchronous, meaning
-    that
-    the code will execute, but not necessarily wait for the code to be executed. Right now, this is not an issue, as we
-    just want to display the value, but it might be of relevance later on. For now, just execute the getBalance method
-    without callback and check your result.
+    The most import module in any Web3 module is the <span class="code">eth</span> interface, which is used to interact
+    with the Ethereum functions. The first of those function we are going to use is <span class="code">eth.getBalance</span>.
+    This
+    function will accept two parameters. The first one is the mandatory account address, the second one is an optional
+    callback.
+    Many functions of Ethereum are asynchronous, meaning that the code will execute, but not necessarily wait for the
+    code to be executed. In order to force a piece of code to be executed, we can use <span class="code">await</span>.
+    But do note: the method it is called in must be an asynchronous method. In the method header, just before a method
+    name, you can add <span class="code">async</span> to make it asynchronous. Any method you have to edit for this
+    workshop will have <span class="code">async</span> already defined. If the method is not asynchronous, there should
+    be no need for it.
+  </p>
+  <p>This project uses <span class="code">/src/services/web3.service.ts</span> to handle most of the Web3 related code,
+    but there are some extra interfaces which we will cover later on. For now, focus on the Web3Service.
+  </p>
+  <p>In this class, you can find several blanc spots in methods. First off, you can focus on the one in the method
+    <span class="code">getEtherBalance</span>. That method is used the get the Ether balance and can be seen on this
+    page.
+  </p>
+  <p>Your task is to write the missing code and update the balance. If you save any code, the page should automatically
+    refresh. If you need any help, consult the Web3JS documentation, found <a target="blanc" href="https://web3js.readthedocs.io/en/1.0/">here</a>
   </p>
   <p>
-    After having done this, we will transfer some Ether to someone else. This is done by making a transaction. As
-    stated before, transactions are done to make changes to the network. Transactions can be made as JavaScript objects
+    Your balance: {{ _balance }} (in Wei)
+  </p>
+  <p *ngIf="!step1Completed">
+    You can continue if you have succesfully retrieved your Ether balance.
+  </p>
+</div>
+<div *ngIf="step1Completed">
+  <h2>
+    Step 2/3: Making a transaction
+  </h2>
+  <p>
+    Your balance is now up to date! You may notice this is in "Wei". Ether is a unit with a significance of eighteen,
+    meaning it can have up to eighteen decimals. The smallest unit of Ether is Wei.
+  </p>
+  <p>
+    But of course, we want to spend this! For this, we need to make a transaction. Of course, you have to write that.
+  </p>
+  <p>Edit the method <span class="code">transferEther</span> in Web3Service in order to transfer Ether. This is done by
+    making a transaction. As stated before, transactions are done to make
+    changes to the network, and transferring Ether to another account is a change. Transactions can be made as
+    JavaScript
+    objects
     with <span class="code">from</span>, <span class="code">to</span>,
     <span class="code">gas</span>, <span class="code">gasPrice</span> and <span class="code">nonce</span>
     variables. The transaction also has either <span class="code">value</span> for transferring Ether or
-    <span class="code">data</span> for interacting with smart contracts, or in rare occassions, both. More info can be
+    <span class="code">data</span> for interacting with smart contracts, or in rare occassions, both. More info can
+    be
     found in the
     <a href="https://web3js.readthedocs.io/en/1.0/web3-eth.html#eth-sendtransaction">
       sendTransaction section of the Web3 readthedocs
@@ -66,9 +98,8 @@
     <span class="code">gasPrice</span>, <span class="code">nonce</span>. The from and to should be obvious.
   </p>
   <ul>
-    <li>Value has a quirk. Ether is a number with a eighteen decimals. The smallest, whole number of an Ether is a wei.
-      In order to transform one Ether to wei for your transaction, you can call <span class="code">web3.toWei(1,
-        'Ether')</span>;</li>
+    <li>In order to transform one Ether to wei for your transaction for value, you can call <span class="code">web3.toWei(1,
+        'Ether')</span>, for example;</li>
     <li>
       the nonce of an account is the amount of transactions it has executed. This can be retrieved by using <span class="code">eth.getTransactionCount('{{publicKey}}')</span>;
     </li>
@@ -76,7 +107,7 @@
       gas is a way to express the price of a transaction. On <a href="https://ethgasstation.info/calculatorTxV.php">Eth
         Gas Station</a> you can check the conversion rates between gas, gasPrice and Ether. Each network has its own
       gas limit. Usually, it's good practice to keep it around 4.7 million, as most networks support at least that
-      amount of gas;
+      amount of gas. This network has a gas limit of <span class="code">{{ _gasLimit }}</span>;
     </li>
     <li>
       the gasPrice is something that is set in the configuration of the nodes of a network. The higher the gasPrice
@@ -93,7 +124,7 @@
     &nbsp;&nbsp;&nbsp;&nbsp;from: {{publicKey}},<br />
     &nbsp;&nbsp;&nbsp;&nbsp;to: 0x88e94A4b7BfC62A38D300d98ce1C09f30fb75e3E,<br />
     &nbsp;&nbsp;&nbsp;&nbsp;nonce: 0x04,<br />
-    &nbsp;&nbsp;&nbsp;&nbsp;gas: 4700000,<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;gas: {{_gasLimit}},<br />
     &nbsp;&nbsp;&nbsp;&nbsp;gasPrice: 1,<br />
     &nbsp;&nbsp;&nbsp;&nbsp;value: web3.toWei(1, 'Ether')<br />
     &nbsp;&nbsp;{{ "}" }}
@@ -103,11 +134,15 @@
     can only be done by the owner of a private key. In order to proof that someone is the actual owner of a key, that
     someone has to cryptographically sign the transaction with that private key. Because the signature of Ethereum is
     asymmetrical, the public key is required to unsign the transaction, proving that the signature is of that public
-    key. Before we can actually make the transaction, we have to sign the transaction first. This is where - if you are
+    key. Before we can actually make the transaction, we have to sign the transaction first. This is where - if you
+    are
     unfamiliar with (asynchronous) JavaScript - it might get a bit complicated. we have to execute two methods. First
-    we will sign our signature with <span class="code">eth.signTransaction</span>. This will result is an object with
-    the transaction and the raw bytes that make up the signature. We have to input those raw bytes in <span class="code">eth.sendRawTransaction</span>.
+    we will sign our signature with <span class="code">accounts.signTransaction</span> and wait for that to finish. This
+    will result is an object with
+    the transaction and the raw bytes that make up the signature, or only the raw bytes.
+    We have to input those raw bytes in <span class="code">eth.sendSignedTransaction</span>.
   </p>
+
   <p>
     Executing a transaction may take some time before this is done. While your transaction is being executed, you
     are free to read the following. It will clear up more about the process of miners and executing transactions, but
@@ -118,7 +153,8 @@
     One of the drawbacks of blockchain in general is that every transaction must be executed by the miners of the
     network. Transactions are hashed, and from this hash, a cryptographic puzzle is generated. The miners of the
     network have to solve this puzzle first in order to get paid for mining. This means that having a more powerful
-    cryptographic computer, the quicker your computer can solve the puzzles and thus generate more Ether. The puzzle is
+    cryptographic computer, the quicker your computer can solve the puzzles and thus generate more Ether. The puzzle
+    is
     usually compared to having a calculation of prime numbers. You have one prime number and the result. For example,
     your have the prime number 13 and the result 36. Your task is to find what other prime number you need to get 36.
     Once you have this solution, you shout to everyone around you what the solution is, and everyone in the room can
@@ -127,185 +163,210 @@
     the sense that the puzzle is hard to solve, but easy to validate.
   </p>
   <p>
-    After your transaction is done, you will see a long bytecode in the console. This is transaction hash. If you
-    enter <span class="code">eth.getTransaction(hash)</span>, you can validate that that was the transaction you had
-    done. If the printed object has <span class="code">status: "false"</span>, the transaction has failed. If this is
-    the case, make sure you do not transfer <i>all</i> your Ether, as you need some for transaction costs (and you will
-    need Ether later on)
+    Use the form below to transfer some Ether to someone else. You can get any address of the people around you. Just
+    make sure you are not transferring all your Ether.
   </p>
-  <div *ngIf="!step1Completed">
-    <p>
-      Enter the transaction receipt below to continue to the next step
-    </p>
-    <input class="input hex hash" [(ngModel)]="_transactionHash" (change)="onEtherTransactionHashChange()" placeholder="0x012345..." />
+  <div class="input-error" *ngIf="_etherError">
+    Looks like something went wrong... consult the browser console for more information
   </div>
-</div>
-<div *ngIf="step1Completed">
-  <h2>Step 2/3: deploying a contract</h2>
-  <p>
-    Ethereum is not only useful for transferring 'money', but also allows code to be executed. This happens via smart
-    contracts. Smart contracts are open and visiable classes of code that can be executed by a network. Because
-    everything is open, everyone (Ethereum node or human) can validate the code, observe how it is executed and decide
-    then to use it. One of the primary examples of how smart contracts can be used, is in the exchange of value. You
-    could, for example, make a smart contract to determine the ownership of an appartment. Everyone can validate who
-    the owner is, everyone can check who the previous owners are, etc. In this step, we are going to deploy a contract
-    to transfer Ether-like currencies.
-  </p>
-  <p>
-    Smart contracts can be written is a couple of languages, but for now, we will only focus on the JavaScript-inspired
-    Solidity language. For now, we also don't need to code in Solidity. This will be covered later on. In this exercise
-    we will only focus on translating existing Solidity code into Ethereum bytecode.
-  </p>
-  <p>
-    In the root folder of this project, you can find a contracts folder. There are a couple of files in there. For now,
-    we will look at the <span class="code">ERC20.sol</span> and <span class="code">GenericToken.sol</span> files. Both
-    files are Solidity files, thus a smart contract for the Ethereum network. Feel free to take a look and inspect the
-    code. It may look familiar to Javascript. The first file is an interface contract, which lays the structure of an
-    ERC20 contract. But what is an ERC20 contract?
-  </p>
-  <p>
-    There are several ERC-contracts. ERC stands for Ethereum Request for Comment, which is a form of standardization
-    within the Ethereum Network. Each ERC-contract is a proposal to a solution of a certain problem. This is purely
-    community driven, meaning that the ERC-contract is as valuable as the community finds it. The Ethereum Foundation
-    has a github entirely dedicated to proposing improvements to the Ethereum network. Part of this is these ERC's.
-    ERC's are made by creating an issue on this page, where the issue ID is the number of the ERC (e.g. issue number 20
-    is ERC20). ERC20 is a community-standard for tokens, which can be transfered across users and solves the problem of
-    transferring value (that is not Ether). ERC20 contracts are widely used to transfer any kind of value and is by now
-    the trading standard. If you want to learn more about this standard, you can look this up on <a href="https://github.com/ethereum/eips/issues/20">the
-      Ethereum github page</a> or look at <a href="https://theethereum.wiki/w/index.php/ERC20_Token_Standard">the
-      Etherum wiki</a> to read more on the entire interface and its options.
-  </p>
-  <p>
-    So the <span class="code">ERC20.sol</span> file contains the interface for this standard. Any ERC20 token contract
-    should implement those methods. <span class="code">GenericToken.sol</span> does implement this interface and thus
-    is a valid ERC20-token.
-  </p>
-  <p>
-    So now we know about the contract, its time to deploy it on the Ethereum network so that we can interact with our
-    own token. To do so, we first have to compile it into bytecode. Then, we need to make a transaction, in which we
-    tellthe network to store the contract bytecode. After that, we need to retrieve the contract address and put it on
-    this web form below. From there on, we can use this page to interact with that token.
-  </p>
-  <p>
-    So let's start with compiling the code. Open a new command window and direct it to the the contracts folder. In
-    there,
-    execute <span class="code">solcjs --bin --output-dir "./build" "GenericToken.sol"</span> to compile the <span class="code">GenericToken.sol</span>
-    file to binary in the build directory as "GenericToken_sol_GenericToken.bin".
-  </p>
-  <p>
-    Now it's time to deploy this contract to the network. For this, go back to the command window we used to connect to
-    the Ethereum node. In this, we have to create a new transaction, but this time it has no <span class="code">value</span>
-    and no <span class="code">to</span> variables. Instead, we are deploying a contract, for which we don't know the
-    address yet, and we are not sending value (Ether), but the contract binary as <span class="code">data</span>
-    variable.
-  </p>
-  <div *ngIf="!step2Completed">
-    <p>
-      After the contract is deployed, you'll have a new transaction receipt again. Paste that receipt below to
-      continue.
-    </p>
-    <input class="input hex hash" [(ngModel)]="_tokenTransactionHash" (change)="onTokenTransactionHashChange()" placeholder="0x012345..." />
+  <div class="label">
+    Destination address (to):
   </div>
-</div>
-<div *ngIf="step2Completed">
-  <h2>Step 3/3: track your tokens</h2>
-  <p>
-    After the contract is deployed, you'll have a new transaction receipt again. If you consult the data of the
-    transaction via <span class="code">eth.getTransactionReceipt</span>, you will see that the transaction has a
-    variable <span class="code">contractAddress</span>. This is the address of the contract you just deployed. Feel
-    free to add it below.
-  </p>
-  <p>
-    Now, because we use a standard (ERC20), we are able to create a general implementation in the web application. We
-    will work more on implementing interaction with smart contracts in the next part, but for now, it's good to know
-    that implementing standards makes it easy to interact. Any ERC20-complaint token can be used in this web
-    application below.
-  </p>
-  <div *ngIf="!step3Completed">
-    <p>
-      The final step in this task is to call and execute a function on this contract. First, paste the address of the
-      contract below to continue.
-    </p>
-    <input class="input hex address" type="text" [(ngModel)]="_currentTokenAddress" (change)="onTokenChange()" />
+  <div class="input-wrapper">
+    <input class="input hex address" [(ngModel)]="_etherToAddress" placeholder="0x12345..." />
   </div>
-</div>
-<div *ngIf="!!_currentToken && !step4Completed">
-  <table>
-    <tr>
-      <td>Token</td>
-      <td><b>{{_currentToken.name}}</b></td>
-    </tr>
-    <tr>
-      <td>Balance</td>
-      <td><b>{{_currentToken.balance}}</b> (without decimals)</td>
+  <div class="label">
+    Amount (in Wei):
+  </div>
+  <div class="input-wrapper">
+    <input class="input number amount" [(ngModel)]="_etherAmount" />
+  </div>
+  <button (click)="transferEther()">Transfer</button>
+  <div *ngIf="step2Completed">
+    <h2>Step 3/3: deploying a contract</h2>
+    <p>
+      Ethereum is not only useful for transferring 'money', but also allows code to be executed. This happens via smart
+      contracts. Smart contracts are open and visiable classes of code that can be executed by a network. Because
+      everything is open, everyone (Ethereum node or human) can validate the code, observe how it is executed and
+      decide
+      then to use it. One of the primary examples of how smart contracts can be used, is in the exchange of value. You
+      could, for example, make a smart contract to determine the ownership of an appartment. Everyone can validate who
+      the owner is, everyone can check who the previous owners are, etc. In this step, we are going to deploy a
+      contract
+      to transfer Ether-like currencies.
+    </p>
+    <p>
+      Smart contracts can be written is a couple of languages, but for now, we will only focus on the
+      JavaScript-inspired
+      Solidity language. For now, we also don't need to code in Solidity. This will be covered later on. In this
+      exercise
+      we will only focus on translating existing Solidity code into Ethereum bytecode.
+    </p>
+    <p>
+      In the root folder of this project, you can find a contracts folder. There are a couple of files in there. For
+      now,
+      we will look at the <span class="code">ERC20.sol</span> and <span class="code">GenericToken.sol</span> files.
+      Both
+      files are Solidity files, thus a smart contract for the Ethereum network. Feel free to take a look and inspect
+      the
+      code. It may look familiar to Javascript. The first file is an interface contract, which lays the structure of an
+      ERC20 contract. But what is an ERC20 contract?
+    </p>
+    <p>
+      There are several ERC-contracts. ERC stands for Ethereum Request for Comment, which is a form of standardization
+      within the Ethereum Network. Each ERC-contract is a proposal to a solution of a certain problem. This is purely
+      community driven, meaning that the ERC-contract is as valuable as the community finds it. The Ethereum Foundation
+      has a github entirely dedicated to proposing improvements to the Ethereum network. Part of this is these ERC's.
+      ERC's are made by creating an issue on this page, where the issue ID is the number of the ERC (e.g. issue number
+      20
+      is ERC20). ERC20 is a community-standard for tokens, which can be transfered across users and solves the problem
+      of
+      transferring value (that is not Ether). ERC20 contracts are widely used to transfer any kind of value and is by
+      now
+      the trading standard. If you want to learn more about this standard, you can look this up on <a href="https://github.com/ethereum/eips/issues/20">the
+        Ethereum github page</a> or look at <a href="https://theethereum.wiki/w/index.php/ERC20_Token_Standard">the
+        Etherum wiki</a> to read more on the entire interface and its options.
+    </p>
+    <p>
+      So the <span class="code">ERC20.sol</span> file contains the interface for this standard. Any ERC20 token
+      contract
+      should implement those methods. <span class="code">GenericToken.sol</span> does implement this interface and thus
+      is a valid ERC20-token.
+    </p>
+    <p>
+      So now we know about the contract, its time to deploy it on the Ethereum network so that we can interact with our
+      own token. To do so, we first have to compile it into bytecode. Then, we need to make a transaction, in which we
+      tellthe network to store the contract bytecode. After that, we need to retrieve the contract address and put it
+      on
+      this web form below. From there on, we can use this page to interact with that token.
+    </p>
+    <p>
+      So let's start with compiling the code. Open a new command window and direct it to the the contracts folder. In
+      there,
+      execute <span class="code">solcjs --bin --output-dir "./build" "GenericToken.sol"</span> to compile the <span
+        class="code">GenericToken.sol</span>
+      file to binary in the build directory as "GenericToken_sol_GenericToken.bin".
+    </p>
+    <p>
+      Now it's time to deploy this contract to the network. For this, go back to the command window we used to connect
+      to
+      the Ethereum node. In this, we have to create a new transaction, but this time it has no <span class="code">value</span>
+      and no <span class="code">to</span> variables. Instead, we are deploying a contract, for which we don't know the
+      address yet, and we are not sending value (Ether), but the contract binary as <span class="code">data</span>
+      variable.
+    </p>
+    <div *ngIf="!step2Completed">
+      <p>
+        After the contract is deployed, you'll have a new transaction receipt again. Paste that receipt below to
+        continue.
+      </p>
+      <input class="input hex hash" [(ngModel)]="_tokenTransactionHash" (change)="onTokenTransactionHashChange()"
+        placeholder="0x012345..." />
+    </div>
+  </div>
+  <div *ngIf="step2Completed">
+    <h2>Step 3/3: track your tokens</h2>
+    <p>
+      After the contract is deployed, you'll have a new transaction receipt again. If you consult the data of the
+      transaction via <span class="code">eth.getTransactionReceipt</span>, you will see that the transaction has a
+      variable <span class="code">contractAddress</span>. This is the address of the contract you just deployed. Feel
+      free to add it below.
+    </p>
+    <p>
+      Now, because we use a standard (ERC20), we are able to create a general implementation in the web application. We
+      will work more on implementing interaction with smart contracts in the next part, but for now, it's good to know
+      that implementing standards makes it easy to interact. Any ERC20-complaint token can be used in this web
+      application below.
+    </p>
+    <div *ngIf="!step3Completed">
+      <p>
+        The final step in this task is to call and execute a function on this contract. First, paste the address of the
+        contract below to continue.
+      </p>
+      <input class="input hex address" type="text" [(ngModel)]="_currentTokenAddress" (change)="onTokenChange()" />
+    </div>
+  </div>
+  <div *ngIf="!!_currentToken && !step4Completed">
+    <table>
+      <tr>
+        <td>Token</td>
+        <td><b>{{_currentToken.name}}</b></td>
+      </tr>
+      <tr>
+        <td>Balance</td>
+        <td><b>{{_currentToken.balance}}</b> (without decimals)</td>
+      </tr>
+    </table>
+    <p>
+      We are following the token at {{ _currentToken.address }}. Now, we will dive into the code how this website can
+      interact
+      that token. Open <span class="code">/src/services/erc20-service.ts</span> and look at the <span class="code">getBalanceOf</span>
+      method. This
+      method is to make a call to the contract. Calls are used to get data from Ethereum. The result is printed above.
+    </p>
+
+    <p>
+      Next up, take a look at the <span class="code">transfer</span> method. In this method, we can see the Typescript
+      handling of what we did before to transfer ether or to deploy a contract. Transactions can be change data in
+      smart
+      contracts, but not to retrieve data. In order to retrieve data from a transaction, one has to use events in smart
+      contracts.
+    </p>
+    <p>
+      For this, take a look at the <span class="code">initTokenEventListener</span> method in the erc20.service.ts
+      file.
+      As defined in the ERC20-standard, every token has to have the Tranfer en Approval events. In this
+      initTokenEventListener, the Token javascript object gets to listen to the Transfer event. If this event is
+      triggered, the <span class="code">updateToken</span> method is called.
+    </p>
+    <p>
+      To test if this works, try to transfer some {{ _currentToken.name }}s to someone else using the form below. When
+      the button Transfer is pressed, the <span class="code">transfer</span> method is called.
+    </p>
+    <div *ngIf="step4Completed && !!this._currentToken">
+      <p>
+        You have completed task 2! From now on, you can track any ERC20 token on this page, allowing you to trade
+        tokens
+        with other people on this network.
+      </p>
+      <p>
+        You have also unlocked the next task, in which you will work with a smart contract and implementing the
+        interaction with that smart contract. Good luck and well done!
+      </p>
+    </div>
+  </div>
+  <table class="tokens" *ngIf="step4Completed">
+    <tr *ngFor="let token of _tokens" [attr.data-address]="token.address">
+      <td>
+        <input type="radio" [(ngModel)]="_currentToken" [value]="token" />
+      </td>
+      <td>
+        {{token.name}}
+      </td>
+      <td>
+        {{token.balance}}
+      </td>
     </tr>
   </table>
-  <p>
-    We are following the token at {{ _currentToken.address }}. Now, we will dive into the code how this website can
-    interact
-    that token. Open <span class="code">/src/services/erc20-service.ts</span> and look at the <span class="code">getBalanceOf</span>
-    method. This
-    method is to make a call to the contract. Calls are used to get data from Ethereum. The result is printed above.
-  </p>
-
-  <p>
-    Next up, take a look at the <span class="code">transfer</span> method. In this method, we can see the Typescript
-    handling of what we did before to transfer ether or to deploy a contract. Transactions can be change data in smart
-    contracts, but not to retrieve data. In order to retrieve data from a transaction, one has to use events in smart
-    contracts.
-  </p>
-  <p>
-    For this, take a look at the <span class="code">initTokenEventListener</span> method in the erc20.service.ts file.
-    As defined in the ERC20-standard, every token has to have the Tranfer en Approval events. In this
-    initTokenEventListener, the Token javascript object gets to listen to the Transfer event. If this event is
-    triggered, the <span class="code">updateToken</span> method is called.
-  </p>
-  <p>
-    To test if this works, try to transfer some {{ _currentToken.name }}s to someone else using the form below. When
-    the button Transfer is pressed, the <span class="code">transfer</span> method is called.
-  </p>
-  <div *ngIf="step4Completed && !!this._currentToken">
-    <p>
-      You have completed task 2! From now on, you can track any ERC20 token on this page, allowing you to trade tokens
-      with other people on this network.
-    </p>
-    <p>
-      You have also unlocked the next task, in which you will work with a smart contract and implementing the
-      interaction with that smart contract. Good luck and well done!
-    </p>
-  </div>
+  <table class="form" *ngIf="!!_currentToken">
+    <tr>
+      <td>Amount</td>
+      <td><input class="input number" [(ngModel)]="_transferAmount" /></td>
+    </tr>
+    <tr>
+      <td>To</td>
+      <td><input class="input hex address" [(ngModel)]="_transferTo" /></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <button (click)="transfer(_currentToken.address)">Transfer</button>
+      </td>
+    </tr>
+    <tr *ngIf="step4Completed">
+      <td>
+        <input class="input hex address" [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
+        <button (click)="addToken()">Add token</button>
+      </td>
+    </tr>
+  </table>
 </div>
-<table class="tokens" *ngIf="step4Completed">
-  <tr *ngFor="let token of _tokens" [attr.data-address]="token.address">
-    <td>
-      <input type="radio" [(ngModel)]="_currentToken" [value]="token" />
-    </td>
-    <td>
-      {{token.name}}
-    </td>
-    <td>
-      {{token.balance}}
-    </td>
-  </tr>
-</table>
-<table class="form" *ngIf="!!_currentToken">
-  <tr>
-    <td>Amount</td>
-    <td><input class="input number" [(ngModel)]="_transferAmount" /></td>
-  </tr>
-  <tr>
-    <td>To</td>
-    <td><input class="input hex address" [(ngModel)]="_transferTo" /></td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <button (click)="transfer(_currentToken.address)">Transfer</button>
-    </td>
-  </tr>
-  <tr *ngIf="step4Completed">
-    <td>
-      <input class="input hex address" [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
-      <button (click)="addToken()">Add token</button>
-    </td>
-  </tr>
-</table>
