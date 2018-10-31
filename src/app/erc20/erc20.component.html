@@ -70,7 +70,7 @@
       In order to transform one Ether to wei for your transaction, you can call <span class="code">web3.toWei(1,
         'Ether')</span>;</li>
     <li>
-      the nonce of an account is the amount of transactions it has executed. This can be retrieved by using <span class="code">eth.getTransactionCount({{publicKey}})</span>;
+      the nonce of an account is the amount of transactions it has executed. This can be retrieved by using <span class="code">eth.getTransactionCount('{{publicKey}}')</span>;
     </li>
     <li>
       gas is a way to express the price of a transaction. On <a href="https://ethgasstation.info/calculatorTxV.php">Eth
@@ -137,7 +137,7 @@
     <p>
       Enter the transaction receipt below to continue to the next step
     </p>
-    <input [(ngModel)]="_transactionHash" (change)="onEtherTransactionHashChange()" placeholder="Transaction hash" />
+    <input class="input hex hash" [(ngModel)]="_transactionHash" (change)="onEtherTransactionHashChange()" placeholder="0x012345..." />
   </div>
 </div>
 <div *ngIf="step1Completed">
@@ -204,7 +204,7 @@
       After the contract is deployed, you'll have a new transaction receipt again. Paste that receipt below to
       continue.
     </p>
-    <input [(ngModel)]="_tokenTransactionHash" (change)="onTokenTransactionHashChange()" placeholder="Transaction receipt" />
+    <input class="input hex hash" [(ngModel)]="_tokenTransactionHash" (change)="onTokenTransactionHashChange()" placeholder="0x012345..." />
   </div>
 </div>
 <div *ngIf="step2Completed">
@@ -226,7 +226,7 @@
       The final step in this task is to call and execute a function on this contract. First, paste the address of the
       contract below to continue.
     </p>
-    <input type="text" [(ngModel)]="_currentTokenAddress" (change)="onTokenChange()" />
+    <input class="input hex address" type="text" [(ngModel)]="_currentTokenAddress" (change)="onTokenChange()" />
   </div>
 </div>
 <div *ngIf="!!_currentToken && !step4Completed">
@@ -291,11 +291,11 @@
 <table class="form" *ngIf="!!_currentToken">
   <tr>
     <td>Amount</td>
-    <td><input [(ngModel)]="_transferAmount" /></td>
+    <td><input class="input number" [(ngModel)]="_transferAmount" /></td>
   </tr>
   <tr>
     <td>To</td>
-    <td><input [(ngModel)]="_transferTo" /></td>
+    <td><input class="input hex address" [(ngModel)]="_transferTo" /></td>
   </tr>
   <tr>
     <td colspan="2">
@@ -304,7 +304,7 @@
   </tr>
   <tr *ngIf="step4Completed">
     <td>
-      <input [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
+      <input class="input hex address" [(ngModel)]="_newTokenAddress" placeholder="Add new token address" />
       <button (click)="addToken()">Add token</button>
     </td>
   </tr>

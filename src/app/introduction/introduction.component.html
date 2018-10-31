@@ -50,20 +50,26 @@
   After installing the Solidity Compiler, you should be settled and ready to go. So, fill in below what node you want
   to connect with. After that, fill in the your given private key. Finally, press submit and continue with the coding game.
 </p>
+<div class="label">
+  Full node address (e.g. ws://127.0.0.1:8546)
+</div>
 <div class="input-error" *ngIf="_nodeAddressInvalid">
   The address of the node is invalid. Are you sure there is a node running at this address?
 </div>
 <div class="input-wrapper" *ngIf="needsNodeAddress">
-  <input [(ngModel)]="_nodeAddress" placeholder="Node address" />
+  <input class="input" [(ngModel)]="_nodeAddress" placeholder="ws://127.0.0.1:8546" />
 </div>
 <p *ngIf="!needsNodeAddress">
   The application already has a node address. If you want to reset your application, go to <a href="/reset">the reset page</a>.
 </p>
+<div class="label">
+  Private key
+</div>
 <div class="input-error" *ngIf="_privateKeyInvalid">
   The private key is invalid.
 </div>
 <div class="input-wrapper">
-  <input [(ngModel)]="_privateKey" placeholder="Private key" />
+  <input class="input hex private-key" [(ngModel)]="_privateKey" placeholder="0x012345..." />
 </div>
 <div class="button-wrapper">
   <button (click)="submit()">

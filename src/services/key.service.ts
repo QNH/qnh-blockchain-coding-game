@@ -61,6 +61,6 @@ export class KeyService {
 
   public async setPrivateKey(privateKey: string): Promise<void> {
     this._privateKey = privateKey;
-    localStorage.setItem(this.storageKey, this.account.privateKey);
+    localStorage.setItem(this.storageKey, this._privateKey);
   }
 }

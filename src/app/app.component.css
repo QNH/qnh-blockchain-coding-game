@@ -47,6 +47,23 @@
   background: rgb(19, 34, 72);
 }
 
+.banner-wrapper {
+  width: 100;
+  position: relative;
+}
+
+.my-address {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  padding: 12px 20px 16px;
+  background: rgb(19, 34, 72);
+  color: #FFFFFF;
+  border-radius: 0 0 0 3px;
+}
+
 .banner {
   width: 100%;
 }
+
+

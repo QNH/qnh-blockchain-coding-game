@@ -48,7 +48,9 @@ contract ERC721 /* is ERC165 */ {
   ///  The operator can manage all NFTs of the owner.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-  event PlotForSale(uint256 indexed _tokenId, uint256 price);
+  event PlotForSale(uint256 indexed _tokenId, uint256 _price);
+
+  event PlotPurchased(uint indexed _tokenId, uint256 _price);
 
   /// @notice Change or reaffirm the approved address for an NFT
   /// @dev The zero address indicates there is no approved address.
@@ -149,6 +151,7 @@ contract ERC721 /* is ERC165 */ {
   }
 
   function createToken(uint _price, address _metadata) external payable {
+    // TODO this should be empty
     require (owner == msg.sender, "Only the contract deployer can create tokens");
     uint256 newId = totalSupply;
     tokens[newId] = msg.sender;
@@ -159,19 +162,33 @@ contract ERC721 /* is ERC165 */ {
     }
     totalSupply += 1;
     emit Transfer(address(0), tokens[newId], newId);
+    if (_price > 0) {
+      emit PlotForSale(newId, _price);
+    }
   }
 
   function purchase(uint256 _tokenId) public payable {
+    // TODO this should be empty
     require (msg.value >= tokenPrices[_tokenId], "Not enough funds to purchase token");
     tokens[_tokenId].transfer(msg.value);
     removeBalance(tokens[_tokenId]);
     tokens[_tokenId] = msg.sender;
     addBalance(tokens[_tokenId]);
+    emit PlotPurchased(_tokenId, tokenPrices[_tokenId]);
+    tokenPrices[_tokenId] = 0;
   }
 
   function removeBalance(address _owner) private {
     require(tokenBalances[_owner] > 0);
     tokenBalances[_owner] -= 1;
+  }
+
+  function setPrice(uint256 _tokenId, uint256 _price) public payable validateOperator(msg.sender, _tokenId) {
+    // TODO this should be empty : BONUS
+    tokenPrices[_tokenId] = _price;
+    if (_price > 0) {
+      emit PlotForSale(_tokenId, _price);
+    }
   }
 
   /// @notice Not implemented for the exercise, but are in essence required as of ERC721!

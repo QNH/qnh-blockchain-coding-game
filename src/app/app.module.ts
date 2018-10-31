@@ -20,6 +20,7 @@ import { Erc721Component } from './erc721/erc721.component';
 import { Erc721Service } from '@services/erc721.service';
 import { DeploymentService } from '@services/deployment.service';
 import { MenuService } from '@services/menu.service';
+import { CompleteComponent } from './complete/complete.component';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { MenuService } from '@services/menu.service';
     Erc20Component,
     Erc721Component,
     IntroductionComponent,
-    ResetComponent
+    ResetComponent,
+    CompleteComponent
   ],
   imports: [
     BrowserModule,
