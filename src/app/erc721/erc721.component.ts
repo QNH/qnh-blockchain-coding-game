@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Erc721Service, CreateErc721TokenFormData } from '@services/erc721.service';
 import { Plot } from '@models/plot';
 import { Part3ValidationService } from '@services/access/part3-validation.service';
+import { RouteService } from '@services/route.service';
 
 
 @Component({
@@ -13,6 +14,7 @@ import { Part3ValidationService } from '@services/access/part3-validation.servic
 })
 export class Erc721Component implements OnInit {
 
+  private _addPlotError = '';
   private _addPlotFormData: CreateErc721TokenFormData;
   private _addPlotLoading = false;
   private _clibboardFailed = false;
@@ -25,6 +27,7 @@ export class Erc721Component implements OnInit {
   constructor(
     private _deploymentService: DeploymentService,
     private _erc721Service: Erc721Service,
+    private _routeService: RouteService,
     private _validationService: Part3ValidationService
   ) { }
 
@@ -83,10 +86,15 @@ export class Erc721Component implements OnInit {
   }
 
   private async purchasePlot(plot: Plot): Promise<void> {
+    const donePurchaseBefore = this._validationService.hasDonePurchase();
     const receipt = await this._erc721Service.purchasePlot(plot);
     if (receipt !== false && !!receipt.status) {
       alert('Success!');
       this._erc721Service.synchronizePlots();
+      if (!donePurchaseBefore) {
+        // redirect
+        this._routeService.navigateToPart4();
+      }
     } else {
       alert('Failure');
     }
@@ -95,11 +103,11 @@ export class Erc721Component implements OnInit {
   private async submitAddPlot(plot: CreateErc721TokenFormData): Promise<void> {
     this._addPlotLoading = true;
     this._erc721Service.createPlot(plot).then(() => {
+      this._erc721Service.synchronizePlots();
       this.closeAddPlot();
       this._addPlotLoading = false;
     }).catch(error => {
       console.error(error);
-      this.closeAddPlot();
       this._addPlotLoading = false;
     });
   }

@@ -54,6 +54,10 @@ export class Part3ValidationService {
     return this._purchasedId >= 0;
   }
 
+  public get partComplete(): boolean {
+    return this.hasDonePurchase() && this.getErc721HasTokens();
+  }
+
   public reset(): void {
     this.setErc721HasTokens(false);
     this.setErc721Address('');

@@ -24,7 +24,7 @@ export class DeploymentService {
     args: any[] = [],
     privateKey: string = this._keyService.getPrivateKey()):
   Promise<string> {
-    let contract = await this._web3Service.getContract(abi);
+    const contract = await this._web3Service.getContract(abi);
     if (!binary || !binary.substr) {
       throw new Error('Invalid bin');
     } else if (binary.substr(0, 2) !== '0x') {
@@ -38,16 +38,16 @@ export class DeploymentService {
       const trx = {
         from: this._web3Service.getAccountByPrivateKey(privateKey).address,
         gas: environment.gas,
-        chainId: environment.chainId
+        chainId: environment.chainId,
+        data: deployment.encodeABI()
       };
       const gasEstimate = await deployment.estimateGas(trx);
-      console.log('Gas estimate for contract deployment: ' + gasEstimate);
       if (gasEstimate > 0) {
-        contract = await deployment.send(trx);
-        if (!!contract &&
-          !!contract.options &&
-          !!contract.options.address) {
-            return contract.options.address;
+        const receipt = await this._web3Service.sendTransaction(trx, privateKey);
+        if (!!receipt &&
+          !!receipt.status &&
+          !!receipt.contractAddress) {
+            return receipt.contractAddress;
           }
       }
     }

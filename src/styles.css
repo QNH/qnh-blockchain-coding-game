@@ -47,3 +47,24 @@ p, li {
 .right {
   text-align: right;
 }
+
+input.input {
+  width: 220px;
+  padding: 0 20px;
+  line-height: 32px;
+  margin: 0 20px 12px 0;
+  border-radius: 3px;
+}
+
+input.hex {
+  font-family: monospace;
+  font-size: 14px;
+}
+
+input.private-key {
+  width: 540px;
+}
+
+input.address {
+  width: 300px;
+}

@@ -4,3 +4,4 @@ environment.prod.ts
 e2e/
 *.spec.ts
 *.bin
+contracts/build/*

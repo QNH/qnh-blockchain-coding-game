@@ -9,7 +9,7 @@ import { environment } from '@environments/environment';
 import { KeyService } from './key.service';
 import { DeploymentService } from './deployment.service';
 import { Part3ValidationService } from './access/part3-validation.service';
-import { TransactionReceipt } from 'web3/types';
+import { TransactionReceipt, EventEmitter } from 'web3/types';
 
 @Injectable()
 export class Erc721Service {
@@ -38,8 +38,9 @@ export class Erc721Service {
     transaction = {
       chainId: environment.chainId,
       gas: environment.gas,
+      gasPrice: environment.gasPrice,
       from: this._keyService.getAddress(),
-      to: contract.options.address,
+      to: this._plotAddress,
       data: contract.methods.createToken(plot.price, metadataAddress).encodeABI()
     };
     const receipt = await this._web3Service.sendTransaction(transaction, this._keyService.getPrivateKey());
@@ -116,6 +117,9 @@ export class Erc721Service {
       gas: environment.gas
     };
     const receipt = await this._web3Service.sendTransaction(transaction, this._keyService.getPrivateKey());
+    if (!this._part3ValidatorService.hasDonePurchase()) {
+      this._part3ValidatorService.setPurchasedId(plot.id);
+    }
     return receipt;
   }
 
