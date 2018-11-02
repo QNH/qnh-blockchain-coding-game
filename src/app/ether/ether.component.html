@@ -1,0 +1,151 @@
+<h1>Ether</h1>
+<p>
+  At the moment, we should be connected to an Ethereum network. The means that we can interact with the blockchain of that
+  network. However, everything is driven by Ether, making it the gasoline of the network. Thus it is essential to know how
+  to know much you have and how you can transfer Ether to other users. those. This task will start with just that.
+</p>
+<div>
+  <h2>Step 1/2: get your balance</h2>
+  <p>
+    The first exercize of this page, it to check our own Ether balance. After that, we will make a transaction by sending some
+    Ether to someone else. We will cover Events in a later task. It is important to note that there are three types of interaction:
+  </p>
+  <ul>
+    <li>With (method) calls, you can ask to get data from the Ethereum network (e.g. get your Ether balance);</li>
+    <li>Transactions are executions or changes on Ethereum (e.g. transfer Ether to someone else);</li>
+    <li>Events are used to detect changes or activities on Ethereum (e.g. when someone transfers Ether)</li>
+  </ul>
+  <p>
+    Interacting with an Ethereum node in Javascript is done via a module called Web3. Web3 is available in many languages, for
+    those interested in continuening to work with it after this workshop. During this workshop however, we will only focus on Web3JS,
+    for Javascript.
+  </p>
+  <p>
+    The most import module in any Web3 module is the <span class="code">eth</span> interface, which is used to interact with
+    the Ethereum functions. The first of those function we are going to use is <span class="code">eth.getBalance</span>.
+    This function will accept two parameters. The first one is the mandatory account address, the second one is an optional
+    callback. Many functions of Ethereum are asynchronous, meaning that the code will execute, but not necessarily wait for
+    the code to be executed. In order to force a piece of code to be executed, we can use <span class="code">await</span>.
+    But do note: the method it is called in must be an asynchronous method. In the method header, just before a method name,
+    you can add <span class="code">async</span> to make it asynchronous. Any method you have to edit for this workshop will
+    have <span class="code">async</span> already defined. If the method is not asynchronous, there should be no need for
+    it.
+  </p>
+  <p>This project uses <span class="code">/src/services/web3.service.ts</span> to handle most of the Web3 related code, but
+    there are some extra interfaces which we will cover later on. For now, focus on the Web3Service.
+  </p>
+  <p>In this class, you can find several blanc spots in methods. First off, you can focus on the one in the method
+    <span class="code">getEtherBalance</span>. That method is used the get the Ether balance and can be seen on this page.
+  </p>
+  <p>Your task is to write the missing code and update the balance. If you save any code, the page should automatically refresh.
+    If you need any help, consult the Web3JS documentation, found <a target="blanc" href="https://web3js.readthedocs.io/en/1.0/">here</a>
+  </p>
+  <p>
+    Your balance: {{ _balance }} (in Wei)
+  </p>
+  <p *ngIf="!step1Completed">
+    You can continue if you have succesfully retrieved your Ether balance.
+  </p>
+</div>
+<div *ngIf="step1Completed">
+  <h2>
+    Step 2/2: Making a transaction
+  </h2>
+  <p>
+    Your balance is now up to date! You may notice this is in "Wei". Ether is a unit with a significance of eighteen, meaning
+    it can have up to eighteen decimals. The smallest unit of Ether is Wei.
+  </p>
+  <p>
+    But of course, we want to spend this! For this, we need to make a transaction. Of course, you have to write that.
+  </p>
+  <p>Edit the method <span class="code">transferEther</span> in Web3Service in order to transfer Ether. This is done by making
+    a transaction. As stated before, transactions are done to make changes to the network, and transferring Ether to another
+    account is a change. Transactions can be made as JavaScript objects with <span class="code">from</span>, <span class="code">to</span>,
+    <span class="code">gas</span>, <span class="code">gasPrice</span> and <span class="code">nonce</span>
+    variables. The transaction also has either <span class="code">value</span> for transferring Ether or
+    <span class="code">data</span> for interacting with smart contracts, or in rare occassions, both. More info can be found
+    in the
+    <a href="https://web3js.readthedocs.io/en/1.0/web3-eth.html#eth-sendtransaction">
+      sendTransaction section of the Web3 readthedocs
+    </a>.
+  </p>
+  <p>
+    Some of these are just configuration of your node. The list below states how to get <span class="code">gas</span>,
+    <span class="code">gasPrice</span>, <span class="code">nonce</span>. The from and to should be obvious.
+  </p>
+  <ul>
+    <li>In order to transform one Ether to wei for your transaction for value, you can call <span class="code">web3.toWei(1,
+        'Ether')
+      </span>, for example;</li>
+    <li>
+      the nonce of an account is the amount of transactions it has executed. This can be retrieved by using <span class="code">eth.getTransactionCount('{{publicKey}}')</span>;
+    </li>
+    <li>
+      gas is a way to express the price of a transaction. On <a href="https://ethgasstation.info/calculatorTxV.php">Eth Gas
+        Station
+      </a> you can check the conversion rates between gas, gasPrice and Ether. Each network has its own gas limit. Usually,
+      it's good practice to keep it around 4.7 million, as most networks support at least that amount of gas. This network
+      has a gas limit of <span class="code">{{ _gasLimit }}</span>;
+    </li>
+    <li>
+      the gasPrice is something that is set in the configuration of the nodes of a network. The higher the gasPrice (price in Ether
+      per gas spent), the sooner a node will execute your transaction. gasPrice is expressed in GWei (gigawei), and by multiplying
+      the gas used in a transaction with the gasPrice, your get the price in GWei. Usually, the gasPrice will be between
+      1 and 20 GWei (or 0 on some private chains);
+    </li>
+  </ul>
+  <p>
+    All of that combined should result in a JavaScript object looking like this:
+  </p>
+  <div class="snippet">
+    &nbsp;&nbsp;{{ "{" }}<br /> &nbsp;&nbsp;&nbsp;&nbsp;from: {{publicKey}},<br /> &nbsp;&nbsp;&nbsp;&nbsp;to: 0x88e94A4b7BfC62A38D300d98ce1C09f30fb75e3E,<br
+    /> &nbsp;&nbsp;&nbsp;&nbsp;nonce: 0x04,<br /> &nbsp;&nbsp;&nbsp;&nbsp;gas: {{_gasLimit}},<br /> &nbsp;&nbsp;&nbsp;&nbsp;gasPrice:
+    1,
+    <br /> &nbsp;&nbsp;&nbsp;&nbsp;value: web3.toWei(1, 'Ether')<br /> &nbsp;&nbsp;{{ "}" }}
+  </div>
+  <p>
+    There is however a significant difference between calls and transactions. Every change on Ethereum is checked and can only
+    be done by the owner of a private key. In order to proof that someone is the actual owner of a key, that someone has
+    to cryptographically sign the transaction with that private key. Because the signature of Ethereum is asymmetrical, the
+    public key is required to unsign the transaction, proving that the signature is of that public key. Before we can actually
+    make the transaction, we have to sign the transaction first. This is where - if you are unfamiliar with (asynchronous)
+    JavaScript - it might get a bit complicated. we have to execute two methods. First we will sign our signature with <span
+      class="code">accounts.signTransaction</span> and wait for that to finish. This will result is an object with the transaction
+    and the raw bytes that make up the signature, or only the raw bytes. We have to input those raw bytes in <span class="code">eth.sendSignedTransaction</span>.
+  </p>
+  <p>
+    Use the form below to transfer some Ether to someone else. You can get any address of the people around you. Just make sure
+    you are not transferring all your Ether.
+  </p>
+  <p>
+    Executing a transaction may take some time before this is done. While your transaction is being executed, you are free to
+    read the following. It will clear up more about the process of miners and executing transactions, but the information
+    is not vital to developing blockchain/decentralized apps. If you just want to work on, skip the next paragraph.
+  </p>
+  <p>
+    One of the drawbacks of blockchain in general is that every transaction must be executed by the miners of the network. Transactions
+    are hashed, and from this hash, a cryptographic puzzle is generated. The miners of the network have to solve this puzzle
+    first in order to get paid for mining. This means that having a more powerful cryptographic computer, the quicker your
+    computer can solve the puzzles and thus generate more Ether. The puzzle is usually compared to having a calculation of
+    prime numbers. You have one prime number and the result. For example, your have the prime number 13 and the result 36.
+    Your task is to find what other prime number you need to get 36. Once you have this solution, you shout to everyone around
+    you what the solution is, and everyone in the room can validate if this is correct. If more than 50% percent agrees with
+    your solution, you and everyone who agreed will continue with their chain with that block added. The example calculation
+    and the blockchain puzzle are similar in the sense that the puzzle is hard to solve, but easy to validate.
+  </p>
+  <div class="input-error" *ngIf="_etherError">
+    Looks like something went wrong... consult the browser console for more information
+  </div>
+  <div class="label">
+    Destination address (to):
+  </div>
+  <div class="input-wrapper">
+    <input class="input hex address" [(ngModel)]="_etherToAddress" placeholder="0x12345..." />
+  </div>
+  <div class="label">
+    Amount (in Wei):
+  </div>
+  <div class="input-wrapper">
+    <input class="input number amount" [(ngModel)]="_etherAmount" />
+  </div>
+  <button (click)="transferEther()">Transfer</button>

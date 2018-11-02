@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Part3ValidationService } from './access/part3-validation.service';
-import { Part2ValidationService } from './access/part2-validation.service';
+import { Part2ValidationService } from '@services/access/part2-validation.service';
+import { Part3ValidationService } from '@services/access/part3-validation.service';
+import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { environment } from '@environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -15,23 +16,23 @@ export class MenuService {
     },
     {
       href: environment.routes.part2,
-      label: 'Task 2: ERC20 Token',
+      label: 'Task 2: Ether',
       shouldShow: (): boolean => this._part2ValidationService.canActivate(false)
     },
     {
       href: environment.routes.part3,
-      label: 'Task 3: ERC721 Asset',
+      label: 'Task 3: ERC20 Tokens',
       shouldShow: (): boolean => this._part2ValidationService.partComplete
     },
     {
       href: environment.routes.part4,
-      label: 'Task 4: ???',
-      shouldShow: (): boolean => false
+      label: 'Task 4: ERC721 Assets',
+      shouldShow: (): boolean => this._part3ValidationService.partComplete
     },
     {
       href: environment.routes.part5,
-      label: 'Task 5: ???',
-      shouldShow: (): boolean => false
+      label: 'Task 5: Completion!',
+      shouldShow: (): boolean => this._part4ValidationService.partComplete
     },
   ];
 
@@ -40,6 +41,7 @@ export class MenuService {
   public constructor(
     private _part2ValidationService: Part2ValidationService,
     private _part3ValidationService: Part3ValidationService,
+    private _part4ValidationService: Part4ValidationService,
     private _router: Router
   ) { }
 

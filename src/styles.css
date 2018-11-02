@@ -33,6 +33,7 @@ p, li {
 
 .code {
   padding: 0 4px;
+  white-space: nowrap;
 }
 
 .snippet {

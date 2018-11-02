@@ -141,7 +141,6 @@ contract ERC721 /* is ERC165 */ {
   /// the Ether balance of a sender
   function() public payable {
     require (msg.value > 0, "Fallback function with no value");
-    // Add Ether balance to msg.sender
   }
 
   /// @dev Add token balance of a person. This is just a helper function

@@ -3,8 +3,9 @@ import { DeploymentService } from '@services/deployment.service';
 import { Observable } from 'rxjs';
 import { Erc721Service, CreateErc721TokenFormData } from '@services/erc721.service';
 import { Plot } from '@models/plot';
-import { Part3ValidationService } from '@services/access/part3-validation.service';
+import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { RouteService } from '@services/route.service';
+import { MenuService } from '@services/menu.service';
 
 
 @Component({
@@ -23,12 +24,14 @@ export class Erc721Component implements OnInit {
   private _erc721Name = '';
   private _erc721Owner = '';
   private _plots: Observable<Plot[]>;
+  private _puchaseLoading = false;
 
   constructor(
     private _deploymentService: DeploymentService,
     private _erc721Service: Erc721Service,
+    private _menuService: MenuService,
     private _routeService: RouteService,
-    private _validationService: Part3ValidationService
+    private _validationService: Part4ValidationService
   ) { }
 
   ngOnInit() {
@@ -42,16 +45,17 @@ export class Erc721Component implements OnInit {
     }
   }
 
-  private async deployClipboard() {
+  private async deployErc721() {
     this._deploymentLoading = true;
-    // @ts-ignore
-    const erc721Address = await navigator.clipboard.readText().then(async text => {
-      const ret = await this._erc721Service.deployErc721Contract(text);
-      return ret;
-    });
-    if (!!erc721Address) {
-      this._erc721Address = erc721Address;
-      this._erc721Service.setContractAddress(erc721Address);
+    let erc721Address
+    try {
+      erc721Address = await this._erc721Service.deployErc721Contract();
+      if (!!erc721Address) {
+        this._erc721Address = erc721Address;
+        this._erc721Service.setContractAddress(erc721Address);
+      }
+    } catch (e) {
+      console.error(e);
     }
     this._deploymentLoading = false;
 
@@ -86,30 +90,36 @@ export class Erc721Component implements OnInit {
   }
 
   private async purchasePlot(plot: Plot): Promise<void> {
-    const donePurchaseBefore = this._validationService.hasDonePurchase();
-    const receipt = await this._erc721Service.purchasePlot(plot);
-    if (receipt !== false && !!receipt.status) {
-      alert('Success!');
-      this._erc721Service.synchronizePlots();
-      if (!donePurchaseBefore) {
-        // redirect
-        this._routeService.navigateToPart4();
+    if (!this._puchaseLoading) {
+      this._puchaseLoading = true;
+      const donePurchaseBefore = this._validationService.hasDonePurchase();
+      const receipt = await this._erc721Service.purchasePlot(plot);
+      if (receipt !== false && !!receipt.status) {
+        this._puchaseLoading = false;
+        this._erc721Service.synchronizePlots();
+        if (!donePurchaseBefore) {
+          this._menuService.syncMenuItems();
+          this._routeService.navigateToPart5();
+        }
+      } else {
+        alert('Failure');
+        this._puchaseLoading = false;
       }
-    } else {
-      alert('Failure');
     }
   }
 
   private async submitAddPlot(plot: CreateErc721TokenFormData): Promise<void> {
-    this._addPlotLoading = true;
-    this._erc721Service.createPlot(plot).then(() => {
-      this._erc721Service.synchronizePlots();
-      this.closeAddPlot();
-      this._addPlotLoading = false;
-    }).catch(error => {
-      console.error(error);
-      this._addPlotLoading = false;
-    });
+    if (!this._addPlotLoading) {
+      this._addPlotLoading = true;
+      this._erc721Service.createPlot(plot).then(() => {
+        this._erc721Service.synchronizePlots();
+        this._addPlotLoading = false;
+        this.closeAddPlot();
+      }).catch(error => {
+        console.error(error);
+        this._addPlotLoading = false;
+      });
+    }
   }
 
 }

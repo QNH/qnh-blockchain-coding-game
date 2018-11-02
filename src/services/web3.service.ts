@@ -30,6 +30,10 @@ export class Web3Service {
     return this._web3;
   }
 
+  public bytesToString(bytes: string): string {
+    return this.web3.utils.hexToAscii(bytes);
+  }
+
   getAccountByPrivateKey(privateKey: string): Account {
     try {
       // @ts-ignore
@@ -165,6 +169,10 @@ export class Web3Service {
   setNodeAddress(nodeAddress: string) {
     this._nodeAddress = nodeAddress;
     localStorage.setItem(this.nodeAddressStorageKey, this._nodeAddress);
+  }
+
+  public stringToBytes(string: string): string {
+    return this.web3.utils.asciiToHex(string);
   }
 
   public async transferEther(from: string, to: string, amount: number, privateKey: string): Promise<TransactionReceipt> {

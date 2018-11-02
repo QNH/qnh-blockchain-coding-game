@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import * as Erc721Contract from '@contracts/erc721';
 import * as Erc721Metadata from '@contracts/erc721-metadata';
 import { Plot } from '@models/plot';
 import Contract from 'web3/eth/contract';
@@ -8,7 +7,7 @@ import { Web3Service } from './web3.service';
 import { environment } from '@environments/environment';
 import { KeyService } from './key.service';
 import { DeploymentService } from './deployment.service';
-import { Part3ValidationService } from './access/part3-validation.service';
+import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { TransactionReceipt, EventEmitter } from 'web3/types';
 
 @Injectable()
@@ -20,15 +19,18 @@ export class Erc721Service {
   constructor(
     private _deploymentService: DeploymentService,
     private _keyService: KeyService,
-    private _part3ValidatorService: Part3ValidationService,
+    private _part3ValidatorService: Part4ValidationService,
     private _web3Service: Web3Service
   ) { }
 
   async createPlot(plot: CreateErc721TokenFormData): Promise<void> {
+    // These two lines are to deploy a metadatacontract for the Bonus
+    const metadataAbi = Erc721Metadata.abi;
+    const metadataBin = Erc721Metadata.bin;
     let contract: Contract, transaction: Object, metadataAddress = '0x0';
     if (!!plot.name || plot.symbol || plot.url) {
       // deploy Metadata
-      metadataAddress = await this._deploymentService.deployContract(Erc721Metadata.abi, Erc721Metadata.bin, [
+      metadataAddress = await this._deploymentService.deployContract(metadataAbi, metadataBin, [
         plot.name,
         plot.symbol,
         plot.url
@@ -54,17 +56,14 @@ export class Erc721Service {
    * if all is done well.
    * @returns The address of the contract
    */
-  public async deployErc721Contract(binary: string): Promise<string> {
-    try {
-      return await this._deploymentService.deployContract(Erc721Contract.abi, binary);
-    } catch (e) {
-      alert('Invalid bin');
-      return undefined;
-    }
+  public async deployErc721Contract(): Promise<string> {
+    const erc721Contract = require('@contracts/erc721.json');
+    return await this._deploymentService.deployContract(erc721Contract.abi, erc721Contract.bin);
   }
 
   private async getContract(address: string): Promise<Contract> {
-    return this._web3Service.getContract(Erc721Contract.abi, address);
+    const erc721Contract = require('@contracts/erc721.json');
+    return this._web3Service.getContract(erc721Contract.abi, address);
   }
 
   private async getMetadataContract(address: string): Promise<Contract> {

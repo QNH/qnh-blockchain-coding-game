@@ -21,6 +21,7 @@ import { Erc721Service } from '@services/erc721.service';
 import { DeploymentService } from '@services/deployment.service';
 import { MenuService } from '@services/menu.service';
 import { CompleteComponent } from './complete/complete.component';
+import { EtherComponent } from './ether/ether.component';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { CompleteComponent } from './complete/complete.component';
     Erc721Component,
     IntroductionComponent,
     ResetComponent,
-    CompleteComponent
+    CompleteComponent,
+    EtherComponent
   ],
   imports: [
     BrowserModule,

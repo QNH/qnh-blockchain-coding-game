@@ -25,11 +25,13 @@ export class DeploymentService {
     privateKey: string = this._keyService.getPrivateKey()):
   Promise<string> {
     const contract = await this._web3Service.getContract(abi);
+    // Helping with the binary a bit ;)
     if (!binary || !binary.substr) {
       throw new Error('Invalid bin');
     } else if (binary.substr(0, 2) !== '0x') {
       binary = '0x' + binary;
     }
+    // TODO remove
     const deployment = await contract.deploy({
       data: binary,
       arguments: args
