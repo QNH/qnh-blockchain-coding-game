@@ -14,6 +14,23 @@ contract ERC721 /* is ERC165 */ {
   mapping(uint256 => address) public tokens;
   uint256 public totalSupply = 0;
 
+
+
+  function createToken(uint _price, address _metadata) external payable {
+    // TODO Create a plot, put it for sale and emit PlotForSale event
+    // Should be 14 lines
+  }
+
+  function purchase(uint256 _tokenId) public payable {
+    // TODO Purchase plot. Use addBalance on buyer, removeBalance on seller,
+    // transer the value of the message (msg) to the seller and change the ownership
+    // of the token. Also, the price of the token should be set to 0.
+    // Should be 6 lines
+    require (msg.value >= tokenPrices[_tokenId], "Not enough funds to purchase token");
+  }
+
+
+
   modifier requireNotNull(address _operator) {
     require (_operator != address(0), "Address is 0-address");
     _;
@@ -48,7 +65,9 @@ contract ERC721 /* is ERC165 */ {
   ///  The operator can manage all NFTs of the owner.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-  event PlotForSale(uint256 indexed _tokenId, uint256 price);
+  event PlotForSale(uint256 indexed _tokenId, uint256 _price);
+
+  event PlotPurchased(uint indexed _tokenId, uint256 _price);
 
   /// @notice Change or reaffirm the approved address for an NFT
   /// @dev The zero address indicates there is no approved address.
@@ -139,7 +158,6 @@ contract ERC721 /* is ERC165 */ {
   /// the Ether balance of a sender
   function() public payable {
     require (msg.value > 0, "Fallback function with no value");
-    // Add Ether balance to msg.sender
   }
 
   /// @dev Add token balance of a person. This is just a helper function
@@ -148,57 +166,8 @@ contract ERC721 /* is ERC165 */ {
     tokenBalances[_owner] += 1;
   }
 
-  function createToken(uint _price, address _metadata) external payable {
-    require (owner == msg.sender, "Only the contract deployer can create tokens");
-    uint256 newId = totalSupply;
-    tokens[newId] = msg.sender;
-    addBalance(tokens[newId]);
-    tokenPrices[newId] = _price;
-    if (_metadata != address(0)) {
-      metadata[newId] = _metadata;
-    }
-    totalSupply += 1;
-    emit Transfer(address(0), tokens[newId], newId);
-  }
-
-  function purchase(uint256 _tokenId) public payable {
-    require (msg.value >= tokenPrices[_tokenId], "Not enough funds to purchase token");
-    tokens[_tokenId].transfer(msg.value);
-    removeBalance(tokens[_tokenId]);
-    tokens[_tokenId] = msg.sender;
-    addBalance(tokens[_tokenId]);
-  }
-
   function removeBalance(address _owner) private {
     require(tokenBalances[_owner] > 0);
     tokenBalances[_owner] -= 1;
-  }
-
-  /// @notice Not implemented for the exercise, but are in essence required as of ERC721!
-
-  /// @notice Transfers the ownership of an NFT from one address to another address
-  /// @dev Throws unless `msg.sender` is the current owner, an authorized
-  ///  operator, or the approved address for this NFT. Throws if `_from` is
-  ///  not the current owner. Throws if `_to` is the zero address. Throws if
-  ///  `_tokenId` is not a valid NFT. When transfer is complete, this function
-  ///  checks if `_to` is a smart contract (code size > 0). If so, it calls
-  ///  `onERC721Received` on `_to` and throws if the return value is not
-  ///  `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
-  /// @param _from The current owner of the NFT
-  /// @param _to The new owner
-  /// @param _tokenId The NFT to transfer
-  /// @param data Additional data with no specified format, sent in call to `_to`
-  function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) external payable {
-    revert("Not implemented");
-  }
-
-  /// @notice Transfers the ownership of an NFT from one address to another address
-  /// @dev This works identically to the other function with an extra data parameter,
-  ///  except this function just sets data to "".
-  /// @param _from The current owner of the NFT
-  /// @param _to The new owner
-  /// @param _tokenId The NFT to transfer
-  function safeTransferFrom(address _from, address _to, uint256 _tokenId) external payable {
-    this.safeTransferFrom(_from, _to, _tokenId, "");
   }
 }

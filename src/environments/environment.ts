@@ -7,6 +7,7 @@ export const environment = {
   production: false,
   web3ConnectionString: 'ws://127.0.0.1:8546',
   gas: 10000000,
+  gasPrice: 1,
   chainId: 3177,
   routes: {
     part1: 'part1',

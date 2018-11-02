@@ -50,8 +50,10 @@
 
 #erc721-application {
   height: 900px;
-  overflow-y: scroll;
+  width: 900px;
+  margin: 0 auto;
   position: relative;
+  margin-bottom: 30px;
 }
 
 #erc721-application * {
@@ -157,10 +159,41 @@
 
 .application-content {
   height: 100%;
+  overflow-y: scroll;
   vertical-align: top;
+}
+
+.application-plots, .application-plot-info {
+  width: 100%;
+}
+
+.application-plot .seperator {
+  position: relative;
+  height: 1px;
+  width: 70%;
+  margin: 0 auto;
+  background: darkgrey;
+}
+
+.application-plot {
+  padding-bottom: 20px;
+  width: 100%;
+  padding: 0 20px ;
+}
+
+.plot-symbol {
+  text-align: right;
+  font-weight: 700;
+}
+
+.plot-price {
+  width: 100%;
 }
 
 .application-footer {
   vertical-align: top;
 }
 
+.not-for-sale {
+  padding-bottom: 25px;
+}

@@ -3,7 +3,9 @@ import { DeploymentService } from '@services/deployment.service';
 import { Observable } from 'rxjs';
 import { Erc721Service, CreateErc721TokenFormData } from '@services/erc721.service';
 import { Plot } from '@models/plot';
-import { Part3ValidationService } from '@services/access/part3-validation.service';
+import { Part4ValidationService } from '@services/access/part4-validation.service';
+import { RouteService } from '@services/route.service';
+import { MenuService } from '@services/menu.service';
 
 
 @Component({
@@ -13,6 +15,7 @@ import { Part3ValidationService } from '@services/access/part3-validation.servic
 })
 export class Erc721Component implements OnInit {
 
+  private _addPlotError = '';
   private _addPlotFormData: CreateErc721TokenFormData;
   private _addPlotLoading = false;
   private _clibboardFailed = false;
@@ -21,11 +24,14 @@ export class Erc721Component implements OnInit {
   private _erc721Name = '';
   private _erc721Owner = '';
   private _plots: Observable<Plot[]>;
+  private _puchaseLoading = false;
 
   constructor(
     private _deploymentService: DeploymentService,
     private _erc721Service: Erc721Service,
-    private _validationService: Part3ValidationService
+    private _menuService: MenuService,
+    private _routeService: RouteService,
+    private _validationService: Part4ValidationService
   ) { }
 
   ngOnInit() {
@@ -39,16 +45,17 @@ export class Erc721Component implements OnInit {
     }
   }
 
-  private async deployClipboard() {
+  private async deployErc721() {
     this._deploymentLoading = true;
-    // @ts-ignore
-    const erc721Address = await navigator.clipboard.readText().then(async text => {
-      const ret = await this._erc721Service.deployErc721Contract(text);
-      return ret;
-    });
-    if (!!erc721Address) {
-      this._erc721Address = erc721Address;
-      this._erc721Service.setContractAddress(erc721Address);
+    let erc721Address
+    try {
+      erc721Address = await this._erc721Service.deployErc721Contract();
+      if (!!erc721Address) {
+        this._erc721Address = erc721Address;
+        this._erc721Service.setContractAddress(erc721Address);
+      }
+    } catch (e) {
+      console.error(e);
     }
     this._deploymentLoading = false;
 
@@ -78,16 +85,49 @@ export class Erc721Component implements OnInit {
     this._addPlotFormData = new CreateErc721TokenFormData();
   }
 
+  private plotForSale(plot: Plot): boolean {
+    return (plot.price > 0);
+  }
+
+  private async purchasePlot(plot: Plot): Promise<void> {
+    if (!this._puchaseLoading) {
+      this._puchaseLoading = true;
+      const receipt = await this._erc721Service.purchasePlot(plot);
+      if (receipt !== false && !!receipt.status) {
+        this._puchaseLoading = false;
+        this._erc721Service.synchronizePlots();
+        if (!this._validationService.hasDonePurchase()) {
+          this._validationService.setPurchasedId(plot.id);
+          this._menuService.syncMenuItems();
+        }
+      } else {
+        alert('Failure');
+        this._puchaseLoading = false;
+      }
+    }
+  }
+
   private async submitAddPlot(plot: CreateErc721TokenFormData): Promise<void> {
-    this._addPlotLoading = true;
-    this._erc721Service.createPlot(plot).then(() => {
-      this.closeAddPlot();
-      this._addPlotLoading = false;
-    }).catch(error => {
-      console.error(error);
-      this.closeAddPlot();
-      this._addPlotLoading = false;
-    });
+    if (!this._addPlotLoading) {
+      this._addPlotLoading = true;
+      this._erc721Service.createPlot(plot).then(async () => {
+        const count = await this._erc721Service.synchronizePlots();
+        if (count > 0 && !this._validationService.getErc721HasTokens()) {
+          const tokenCount = await this._erc721Service.getPlotCount();
+          if (tokenCount > 0) {
+            this._validationService.setErc721HasTokens(true);
+            this._menuService.syncMenuItems();
+          } else {
+            console.warn('You seem to have created a plot, but the totalSupply has not increased! Make sure the smart contract increases the totalSupply after creating a token');
+          }
+        }
+        this._addPlotLoading = false;
+        this.closeAddPlot();
+      }).catch(error => {
+        console.error(error);
+        this._addPlotLoading = false;
+      });
+    }
   }
 
 }

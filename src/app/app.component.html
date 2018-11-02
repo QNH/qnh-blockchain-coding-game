@@ -8,7 +8,10 @@
       </tr>
     </table>
   </div>
-  <img src="/assets/images/banner.jpg" class="banner" />
+  <div class="banner-wrapper">
+    <div class="my-address" *ngIf="hasAddress()">My address is {{ getAddress() }}</div>
+    <img src="/assets/images/banner.jpg" class="banner" />
+  </div>
   <div id="body">
     <router-outlet></router-outlet>
   </div>
