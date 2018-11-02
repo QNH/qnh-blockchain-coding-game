@@ -38,24 +38,9 @@ export class Erc20Service {
    * @param accountAddress The address of the account
    */
   async getBalanceOf(erc20Address: string, accountAddress: string = this._keyService.getAddress()): Promise<any> {
-    // First get the Javascript Definition of the contract, via the Abstract Binary Interface (ABI)
-    // and the address of the contract. Note that there is NO VALIDATION on whether the contract
-    // matches the given ABI, meaning you cannot check if the address does match the ABI.
-    // The getContract method is defined below for reusable code. You will use this method a lot.
-    const contract = await this.getContract(erc20Address);
-
-    // Next, get the declerations of the methods in the contract ABI. Still no exceptions if the
-    // ABI does not match the one at the contract address.
-    const methods = contract.methods;
-
-    // Make a definition of the method you want to execute.
-    const method = methods.balanceOf(accountAddress);
-
-    // Make the (asynchronous) call to the Ethereum node. If the ABI does not match the bytecode at the address,
-    // you will receive an error here, defining it cannot make BigInteger object from the response.
-    // So if the ABI defined that the response was a string, it would only give you an empty string.
-    const balance = await method.call();
-    return balance;
+    // Make an Ethereum call to get the balance.
+    // Should be 2 lines.
+    return '';
   }
 
   private async getContract(erc20Address: string = null): Promise<Contract> {
@@ -68,8 +53,10 @@ export class Erc20Service {
    * @param erc20Address The address of the token
    */
   async getName(erc20Address: string): Promise<string> {
-    const contract = await this.getContract(erc20Address);
-    const bytes = await contract.methods.name().call();
+    // The smart contracts only stores bytes, so we have 
+    // to make the readable. This have been done already 
+    // Should be 2 lines
+    const bytes = '';
     return this._web3Service.bytesToString(bytes);
   }
 
@@ -93,12 +80,14 @@ export class Erc20Service {
   }
 
   public async initTokenEventEmitter(token: Token, callback: Callback<EventLog>): Promise<EventEmitter> {
+    // Setup the event in the contract object to get it to call 
+    // "callback" each time the event is emitted by the contract.
+    // Should be 3 lines of code
+    
+    // fromBlock is an option you can use to define from when to look.
+    // Optional.  
     const fromBlock = this._web3Service.getLatestBlockNumber();
-    // First, again, get the contract.
-    const tokenContract = await this.getContract(token.address);
-
-    // Next, add a callback to the Transfer event in the smart contract
-    return tokenContract.events.allEvents({fromBlock: await this._web3Service.getLatestBlockNumber() }, callback);
+    return null;
   }
 
   async isValidErc20(contractAddress: string): Promise<boolean> {
@@ -122,27 +111,9 @@ export class Erc20Service {
    * @param amount The amount to transfer
    */
   async transfer(erc20Address: string, privateKey: string, to: string, amount: number): Promise<TransactionReceipt> {
-    // First, we need to define what the transaction will do. For this, inform
-    // the contract of the data
-    const contract = await this.getContract(erc20Address);
-    const method = contract.methods.transfer(to, amount);
-
-    // Then, declare the transaction
-    const transaction = {
-      // Each blockchain network is defined by a (semi-)unique number. This
-      // is called the chain id.
-      chainId: environment.chainId,
-      // Each transaction costs gas, and is limited in the amount of gas
-      // you can spend per transaction
-      gas: environment.gas,
-      // You don't send the transaction to the other account. You instead
-      // send it to the contract, and the contract decides what happens.
-      to: erc20Address,
-      // The blockchain only receives Abstract Binary Interface (ABI) data.
-      // In order to make the transaction accept the data, encode it.
-      data: method.encodeABI()
-    };
-    const receipt = await this._web3Service.sendTransaction(transaction, privateKey);
+    // Make the transaction using the contract object. You do not need
+    // the value of a transation: the value should be in the data, thus abi. 
+    const receipt = null;
     return receipt;
   }
 

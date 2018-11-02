@@ -92,14 +92,13 @@ export class Erc721Component implements OnInit {
   private async purchasePlot(plot: Plot): Promise<void> {
     if (!this._puchaseLoading) {
       this._puchaseLoading = true;
-      const donePurchaseBefore = this._validationService.hasDonePurchase();
       const receipt = await this._erc721Service.purchasePlot(plot);
       if (receipt !== false && !!receipt.status) {
         this._puchaseLoading = false;
         this._erc721Service.synchronizePlots();
-        if (!donePurchaseBefore) {
+        if (!this._validationService.hasDonePurchase()) {
+          this._validationService.setPurchasedId(plot.id);
           this._menuService.syncMenuItems();
-          this._routeService.navigateToPart5();
         }
       } else {
         alert('Failure');
@@ -111,8 +110,17 @@ export class Erc721Component implements OnInit {
   private async submitAddPlot(plot: CreateErc721TokenFormData): Promise<void> {
     if (!this._addPlotLoading) {
       this._addPlotLoading = true;
-      this._erc721Service.createPlot(plot).then(() => {
-        this._erc721Service.synchronizePlots();
+      this._erc721Service.createPlot(plot).then(async () => {
+        const count = await this._erc721Service.synchronizePlots();
+        if (count > 0 && !this._validationService.getErc721HasTokens()) {
+          const tokenCount = await this._erc721Service.getPlotCount();
+          if (tokenCount > 0) {
+            this._validationService.setErc721HasTokens(true);
+            this._menuService.syncMenuItems();
+          } else {
+            console.warn('You seem to have created a plot, but the totalSupply has not increased! Make sure the smart contract increases the totalSupply after creating a token');
+          }
+        }
         this._addPlotLoading = false;
         this.closeAddPlot();
       }).catch(error => {

@@ -66,7 +66,7 @@ export class Erc20Component implements OnInit {
     return this._partValidator.hasDoneTokenTransfer;
   }
 
-  private get step4Completed(): boolean { 
+  private get step4Completed(): boolean {
     return this._partValidator.hasDoneTokenEvent;
   }
 
@@ -84,11 +84,13 @@ export class Erc20Component implements OnInit {
 
   private async getToken(): Promise<void> {
     this._token = await this._erc20Service.getTokenByAddressAsync(this.currentAddress);
-    if (!this._token.eventEmitter) {
-      this._erc20Service.initTokenEventEmitter(this._token, this.onTokenUpdate.bind(this));
-    }
-    if (!this._partValidator.hasDoneTokenBalance && !!this._token.balance && !!this._token.balance.length) {
-      this._partValidator.setHasDoneTokenBalance(true);
+    if (!!this._token) {
+      if (!this._token.eventEmitter) {
+        this._erc20Service.initTokenEventEmitter(this._token, this.onTokenUpdate.bind(this));
+      }
+      if (!this._partValidator.hasDoneTokenBalance && !!this._token.balance && !!this._token.balance.length) {
+        this._partValidator.setHasDoneTokenBalance(true);
+      }
     }
   }
 

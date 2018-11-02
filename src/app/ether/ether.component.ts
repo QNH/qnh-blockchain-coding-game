@@ -13,6 +13,7 @@ import { MenuService } from '@services/menu.service';
 })
 export class EtherComponent implements OnInit {
 
+  private _chainId = environment.chainId;
   private _gasLimit = environment.gas;
 
   // Step 1: getting your balance

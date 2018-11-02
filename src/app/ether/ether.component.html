@@ -17,8 +17,8 @@
   </ul>
   <p>
     Interacting with an Ethereum node in Javascript is done via a module called Web3. Web3 is available in many languages, for
-    those interested in continuening to work with it after this workshop. During this workshop however, we will only focus on Web3JS,
-    for Javascript.
+    those interested in continuening to work with it after this workshop. During this workshop however, we will only focus
+    on Web3JS, for Javascript.
   </p>
   <p>
     The most import module in any Web3 module is the <span class="code">eth</span> interface, which is used to interact with
@@ -100,7 +100,7 @@
   <div class="snippet">
     &nbsp;&nbsp;{{ "{" }}<br /> &nbsp;&nbsp;&nbsp;&nbsp;from: {{publicKey}},<br /> &nbsp;&nbsp;&nbsp;&nbsp;to: 0x88e94A4b7BfC62A38D300d98ce1C09f30fb75e3E,<br
     /> &nbsp;&nbsp;&nbsp;&nbsp;nonce: 0x04,<br /> &nbsp;&nbsp;&nbsp;&nbsp;gas: {{_gasLimit}},<br /> &nbsp;&nbsp;&nbsp;&nbsp;gasPrice:
-    1,
+    1,<br /> &nbsp;&nbsp;&nbsp;&nbsp;chainId: {{_chainId}},
     <br /> &nbsp;&nbsp;&nbsp;&nbsp;value: web3.toWei(1, 'Ether')<br /> &nbsp;&nbsp;{{ "}" }}
   </div>
   <p>

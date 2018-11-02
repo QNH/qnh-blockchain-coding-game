@@ -61,8 +61,8 @@ export class Web3Service {
    * @memberof Web3Service
    */
   public async getEtherBalance(address: string): Promise<number> {
-    // Number of expected lines: 1
-    return this.web3.eth.getBalance(address);
+    // Should be 1 line
+    return null;
   }
 
   async getLatestBlockNumber(): Promise<number> {
@@ -145,11 +145,15 @@ export class Web3Service {
    * @param privateKey The private key to sign with
    */
   async sendTransaction(transaction: Object, privateKey: string): Promise<TransactionReceipt> {
-    // Must use web3.eth.accounts.signTransaction
-    // Can not use web3.eth.signTranscation
-    const signature = await this.web3.eth.accounts.signTransaction(transaction, privateKey);
+    // The eth module has a sign method, but this 
+    // is not intented for signing with a private 
+    // key (don't ask why). Instead, you should look into
+    // _who_ is signing ;) 
+    // Should be 1 line
+    const signature = 'missing';
 
-    // signature can be an object or a string.
+    // signature can be an object or a string. This helps you 
+    // debugging for a proper two days or so
     let rawTransaction: string;
     if (typeof (signature) === 'string') {
       rawTransaction = signature;
@@ -159,8 +163,8 @@ export class Web3Service {
     }
 
     if (!!signature) {
-      // Send signed transaction
-      return await this.web3.eth.sendSignedTransaction(rawTransaction);
+      // Send raw transaction, should be 1 line
+      return null;
     } else {
       return null;
     }
@@ -177,14 +181,12 @@ export class Web3Service {
 
   public async transferEther(from: string, to: string, amount: number, privateKey: string): Promise<TransactionReceipt> {
     const nonce = await this.web3.eth.getTransactionCount(from);
+    const gas = environment.gas;
     const transaction = {
-      from: from,
-      to: to,
-      amount: amount,
-      nonce: nonce,
-      gas: environment.gas,
-      gasPrice: environment.gasPrice,
-      chainId: environment.chainId
+      // Fill the transaction with the necessary parts. 
+
+
+
     };
     // sendTransaction needs more help in order to actually sign the transation.
     // If using Visual Studio Code, ctrl-click on sendTransaction below will

@@ -43,14 +43,14 @@
   </p>
   <div *ngIf="!hasCreatedErc721Token()">
     <p>
-      For a start, make sure you are able to create an ERC721 token.
+      For a start, make sure you are able to create an ERC721 token. This is done in the <span class="code">createPlot</span> method in the Erc721 Service. Also make sure that <span class="code">getPlotById</span> knows how to get the data.
     </p>
     <p><span class="bonus">BONUS! </span> Make it so that the name and symbol parts of the form are used. The site can
       already process them - if done right.</p>
   </div>
   <div *ngIf="hasCreatedErc721Token() && !hasPurchasedErc721Token()">
     <p>
-      Now that your ERC721 contract has a token, you can try to purchase it, or let anyone around you purchase it.
+      Now that your ERC721 contract has a token, you can try to purchase it, or let anyone around you purchase it. This is done, using the <span class="code">purchase plot method.</span>
     </p>
   </div>
   <p>

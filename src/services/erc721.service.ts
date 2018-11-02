@@ -9,6 +9,7 @@ import { KeyService } from './key.service';
 import { DeploymentService } from './deployment.service';
 import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { TransactionReceipt, EventEmitter } from 'web3/types';
+import { listLazyRoutes } from '@angular/compiler/src/aot/lazy_routes';
 
 @Injectable()
 export class Erc721Service {
@@ -19,34 +20,24 @@ export class Erc721Service {
   constructor(
     private _deploymentService: DeploymentService,
     private _keyService: KeyService,
-    private _part3ValidatorService: Part4ValidationService,
+    private _part4ValidatorService: Part4ValidationService,
     private _web3Service: Web3Service
   ) { }
 
-  async createPlot(plot: CreateErc721TokenFormData): Promise<void> {
+  async createPlot(plot: CreateErc721TokenFormData): Promise<TransactionReceipt> {
     // These two lines are to deploy a metadatacontract for the Bonus
     const metadataAbi = Erc721Metadata.abi;
     const metadataBin = Erc721Metadata.bin;
     let contract: Contract, transaction: Object, metadataAddress = '0x0';
     if (!!plot.name || plot.symbol || plot.url) {
       // deploy Metadata
-      metadataAddress = await this._deploymentService.deployContract(metadataAbi, metadataBin, [
-        plot.name,
-        plot.symbol,
-        plot.url
-      ]);
+      // The form does not have any url, but this
+      // should reduce clutter in the exercises. Url
+      // is part of the standard though. 
+
     }
-    contract = await this.getContract(this._plotAddress);
-    transaction = {
-      chainId: environment.chainId,
-      gas: environment.gas,
-      gasPrice: environment.gasPrice,
-      from: this._keyService.getAddress(),
-      to: this._plotAddress,
-      data: contract.methods.createToken(plot.price, metadataAddress).encodeABI()
-    };
-    const receipt = await this._web3Service.sendTransaction(transaction, this._keyService.getPrivateKey());
-    return;
+    const receipt = null;
+    return receipt;
   }
 
   /**
@@ -68,6 +59,20 @@ export class Erc721Service {
 
   private async getMetadataContract(address: string): Promise<Contract> {
     return this._web3Service.getContract(Erc721Metadata.abi, address);
+  }
+
+  public async getPlotById(plotId: number): Promise<Plot> {
+    // Get the plot as per contract. 
+    // Mappings are condsidered function for 
+    // Javascript. 
+    // Should be between 5 and 10 lines
+    const plot = null;
+    return plot;
+  }
+
+  public async getPlotCount(): Promise<number> {
+    const contract = await this.getContract(this._plotAddress);
+    return await contract.methods.totalSupply().call();
   }
 
   getPlots(): Observable<Plot[]> {
@@ -93,7 +98,7 @@ export class Erc721Service {
 
   public getPlotAddress(): string {
     if (!this._plotAddress || !this._plotAddress.length) {
-      this._plotAddress = this._part3ValidatorService.getErc721ContractAddress();
+      this._plotAddress = this._part4ValidatorService.getErc721ContractAddress();
     }
     return !!this._plotAddress ?
       this._plotAddress : undefined;
@@ -104,21 +109,9 @@ export class Erc721Service {
       console.error('No contract for plot is set!');
       return false;
     }
-    const contract = await this.getContract(this._plotAddress);
-    const price = await contract.methods.tokenPrices(plot.id).call();
-    const abi = contract.methods.purchase(plot.id).encodeABI();
-    const transaction = {
-      chainId: environment.chainId,
-      from: this._keyService.getAddress(),
-      to: this._plotAddress,
-      value: price,
-      data: abi,
-      gas: environment.gas
-    };
-    const receipt = await this._web3Service.sendTransaction(transaction, this._keyService.getPrivateKey());
-    if (!this._part3ValidatorService.hasDonePurchase()) {
-      this._part3ValidatorService.setPurchasedId(plot.id);
-    }
+    // Purchase a plot.
+    // Should be around 12 lines
+    const receipt = null;
     return receipt;
   }
 
@@ -129,39 +122,31 @@ export class Erc721Service {
 
   public setContractAddress(address: string): void {
     this._plotAddress = address;
-    this._part3ValidatorService.setErc721Address(address);
+    this._part4ValidatorService.setErc721Address(address);
     this._erc721Subject.next([]);
     this.synchronizePlots();
   }
 
-  async synchronizePlots(): Promise<void> {
+  async synchronizePlots(): Promise<number> {
     if (!!this._plotAddress) {
       const contract = await this.getContract(this._plotAddress);
       const totalSupply = await contract.methods.totalSupply().call();
       const list = [];
       for (let id = 0; id < totalSupply; id++) {
-        const plot = new Plot();
-        plot.id = id;
-        const metadataAddress = await contract.methods.metadata(id).call();
-        if (!this._web3Service.isNullOrInvalidAddress(metadataAddress)) {
-          plot.metadataAddress = metadataAddress;
-          const metadata = await this.getMetadataContract(plot.metadataAddress);
-          plot.name = await metadata.methods.name().call();
-          plot.symbol = await metadata.methods.symbol().call();
+        try {
+          list.push(this.getPlotById(id));
+        } catch (e) {
+          console.error("Failed loading plot " + id + ", " + e);
         }
-        plot.price = await contract.methods.tokenPrices(id).call();
-        plot.ownerAddress = await contract.methods.tokens(id).call();
-        list.push(plot);
-      }
-      if (!this._part3ValidatorService.getErc721HasTokens() && list.length > 0) {
-        this._part3ValidatorService.setErc721HasTokens(true);
       }
       this._erc721Subject.next(list);
+      return list.length;
     } else {
       if (this._erc721Subject.getValue().length > 0) {
         this._erc721Subject.next([]);
       }
     }
+    return 0;
   }
 
 }
