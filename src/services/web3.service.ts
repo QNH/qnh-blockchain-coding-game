@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import Contract from 'web3/eth/contract';
 import { Account } from 'web3/eth/accounts';
 import { CanActivate } from '@angular/router';
+import { environment } from '@environments/environment';
 
 @Injectable()
 export class Web3Service {
@@ -14,7 +15,7 @@ export class Web3Service {
 
   constructor() { }
 
-  private get web3(): any {
+  private get web3(): Web3 {
     if (!this.hasNodeAddress) {
       const nodeAddress = localStorage.getItem(this.nodeAddressStorageKey);
       if (!!nodeAddress) {
@@ -29,8 +30,13 @@ export class Web3Service {
     return this._web3;
   }
 
+  public bytesToString(bytes: string): string {
+    return this.web3.utils.hexToAscii(bytes);
+  }
+
   getAccountByPrivateKey(privateKey: string): Account {
     try {
+      // @ts-ignore
       return this.web3.eth.accounts.privateKeyToAccount(privateKey);
     } catch (e) {
       return null;
@@ -45,6 +51,18 @@ export class Web3Service {
    */
   async getContract(abi: any[], address: string = null): Promise<Contract> {
     return new this.web3.eth.Contract(abi, address);
+  }
+
+  /**
+   *Get the Ether balance of an account
+   *
+   * @param string The address of the account to check the Ether balance of
+   * @returns The Ether balance in Wei
+   * @memberof Web3Service
+   */
+  public async getEtherBalance(address: string): Promise<number> {
+    // Should be 1 line
+    return null;
   }
 
   async getLatestBlockNumber(): Promise<number> {
@@ -127,7 +145,15 @@ export class Web3Service {
    * @param privateKey The private key to sign with
    */
   async sendTransaction(transaction: Object, privateKey: string): Promise<TransactionReceipt> {
-    const signature = await this.web3.eth.accounts.signTransaction(transaction, privateKey);
+    // The eth module has a sign method, but this 
+    // is not intented for signing with a private 
+    // key (don't ask why). Instead, you should look into
+    // _who_ is signing ;) 
+    // Should be 1 line
+    const signature = 'missing';
+
+    // signature can be an object or a string. This helps you 
+    // debugging for a proper two days or so
     let rawTransaction: string;
     if (typeof (signature) === 'string') {
       rawTransaction = signature;
@@ -135,8 +161,10 @@ export class Web3Service {
       // @ts-ignore
       rawTransaction = signature.rawTransaction;
     }
+
     if (!!signature) {
-      return await this.web3.eth.sendSignedTransaction(rawTransaction);
+      // Send raw transaction, should be 1 line
+      return null;
     } else {
       return null;
     }
@@ -145,6 +173,25 @@ export class Web3Service {
   setNodeAddress(nodeAddress: string) {
     this._nodeAddress = nodeAddress;
     localStorage.setItem(this.nodeAddressStorageKey, this._nodeAddress);
+  }
+
+  public stringToBytes(string: string): string {
+    return this.web3.utils.asciiToHex(string);
+  }
+
+  public async transferEther(from: string, to: string, amount: number, privateKey: string): Promise<TransactionReceipt> {
+    const nonce = await this.web3.eth.getTransactionCount(from);
+    const gas = environment.gas;
+    const transaction = {
+      // Fill the transaction with the necessary parts. 
+
+
+
+    };
+    // sendTransaction needs more help in order to actually sign the transation.
+    // If using Visual Studio Code, ctrl-click on sendTransaction below will
+    // direct you to the declaration of the method
+    return this.sendTransaction(transaction, privateKey);
   }
 
 }

@@ -1,8 +1,7 @@
-<h1>ERC721 tokens</h1>
+<h1>ERC721 assets</h1>
 <p>
   In this exercise we will be looking into getting into coding some of the smart contract and the communication with it
-  as well. For this, you need a basic understanding of Typescript or at least Javascript. If not, it might be wise to
-  look if you can team up with someone, but it shouldn't be that hard.
+  as well. This is done by executing a use case provided below. 
 </p>
 <p>
   As a reminder, applications can communicate with contracts in three ways: getting data is done using calls, altering
@@ -26,12 +25,11 @@
   <li>when a plot gets up for sale (or the price changes), a PlotForSale event should trigger with the identifier and
     the new price of the plot.</li>
 </ul>
-<div *ngIf="!hasErc721Contract">
+<div *ngIf="!hasErc721Contract()">
   <p>
     Edit to contract to match these requirements. The headers of the functions are already there and may not change.
-    You can deploy a new ERC721 contract using the button below. The button will paste your clipboard in the browser
-    and deploy the contents of your clipboard. This will result in an address. This page will consider any contract as
-    an ERC721 contract.
+    You can deploy a new ERC721 contract using the button below. The bytecode of the contract must be placed in <span class="code">/src/contracts/erc721.json</span>. When the deployment is done, the application will remember the address and use it for the use case. This page will consider any contract as
+    an ERC721 contract. 
   </p>
 </div>
 <div *ngIf="hasErc721Contract()">
@@ -41,19 +39,18 @@
     application and the contract. This is done is the Erc721Service found in <span class="code">/src/services/erc721.service.ts</span>.
     The method headers have already been estabilished. If it turns out your made a mistake in your contract and you
     want to make a change, you have to recompile and redeploy the entire contract, meaning you'll get a new address. At
-    the bottom of the page, you will always be able to deploy a contract again, as long as you have the binary code on
-    your clipboard.
+    the bottom of the page, you will always be able to deploy a contract again, as long as update the binary in <span class="code">erc721.json</span>.
   </p>
   <div *ngIf="!hasCreatedErc721Token()">
     <p>
-      For a start, make sure you are able to create an ERC721 token.
+      For a start, make sure you are able to create an ERC721 token. This is done in the <span class="code">createPlot</span> method in the Erc721 Service. Also make sure that <span class="code">getPlotById</span> knows how to get the data.
     </p>
     <p><span class="bonus">BONUS! </span> Make it so that the name and symbol parts of the form are used. The site can
       already process them - if done right.</p>
   </div>
   <div *ngIf="hasCreatedErc721Token() && !hasPurchasedErc721Token()">
     <p>
-      Now that your ERC721 contract has a token, you can try to purchase it, or let anyone around you purchase it.
+      Now that your ERC721 contract has a token, you can try to purchase it, or let anyone around you purchase it. This is done, using the <span class="code">purchase plot method.</span>
     </p>
   </div>
   <p>
@@ -100,10 +97,9 @@
           </tr>
           <tr>
             <td colspan="2" class="add-plot-submit" [class.right]="!_addPlotLoading" [class.center]="_addPlotLoading">
-              <button (click)="submitAddPlot(_addPlotFormData)" *ngIf="!_addPlotLoading">
+              <button (click)="submitAddPlot(_addPlotFormData)" [disabled]="_addPlotLoading">
                 Add plot
               </button>
-              <img *ngIf="_addPlotLoading" src="/assets/images/application-loader.gif" />
             </td>
           </tr>
         </table>
@@ -145,11 +141,11 @@
                   </tr>
                   <tr *ngIf="plotForSale(plot)">
                     <td colspan="2" class="button-wrapper">
-                      <button (click)="purchasePlot(plot)">Purchase this plot</button>
+                      <button [disabled]="_puchaseLoading" (click)="purchasePlot(plot)">Purchase this plot</button>
                     </td>
                   </tr>
                   <tr *ngIf="!plotForSale(plot)">
-                    <td colspan="3">
+                    <td colspan="3" class="not-for-sale">
                       Not for sale
                     </td>
                   </tr>
@@ -170,7 +166,7 @@
 </div>
 <div class="deployment-helper">
   <div *ngIf="!_deploymentLoading">
-    <p (click)="deployClipboard()">Deploy contract from clipboard</p>
+    <button (click)="deployErc721()">Deploy new ERC721</button>
     <p *ngIf="!!_erc721Address && !!_erc721Address.length">
       Last deployed contract address: {{_erc721Address}}
     </p>

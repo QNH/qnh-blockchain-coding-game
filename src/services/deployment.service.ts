@@ -25,32 +25,14 @@ export class DeploymentService {
     privateKey: string = this._keyService.getPrivateKey()):
   Promise<string> {
     const contract = await this._web3Service.getContract(abi);
+    // Helping with the binary a bit ;)
     if (!binary || !binary.substr) {
       throw new Error('Invalid bin');
     } else if (binary.substr(0, 2) !== '0x') {
       binary = '0x' + binary;
     }
-    const deployment = await contract.deploy({
-      data: binary,
-      arguments: args
-    });
-    if (!!deployment) {
-      const trx = {
-        from: this._web3Service.getAccountByPrivateKey(privateKey).address,
-        gas: environment.gas,
-        chainId: environment.chainId,
-        data: deployment.encodeABI()
-      };
-      const gasEstimate = await deployment.estimateGas(trx);
-      if (gasEstimate > 0) {
-        const receipt = await this._web3Service.sendTransaction(trx, privateKey);
-        if (!!receipt &&
-          !!receipt.status &&
-          !!receipt.contractAddress) {
-            return receipt.contractAddress;
-          }
-      }
-    }
+    // This is where a contract should be deployed. 
+    // Should be around 20 (neat) lines or 6 (less-neat) lines
     return null;
   }
 

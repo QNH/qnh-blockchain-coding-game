@@ -8,14 +8,11 @@ import { Erc20Service } from '@services/erc20.service';
 @Injectable()
 export class Part2ValidationService implements CanActivate {
 
+  private _hasEtherBalance: boolean;
+  private readonly HasEtherBalanceStorageKey = 'bcg_ether_has_balance';
+
   private _etherTransactionHash: string;
   private readonly EtherTransactionHashStorageKey = 'bcg_ether_transaction_hash';
-
-  private _tokenTransactionHash: string;
-  private readonly TokenTransactionHashStorageKey = 'bcg_token_transaction_hash';
-
-  private _tokenTransferHash: string;
-  private readonly TokenTransferHashStorageKey = 'bcg_token_transfer_hash';
 
   constructor(
     private _erc20Service: Erc20Service,
@@ -23,17 +20,11 @@ export class Part2ValidationService implements CanActivate {
     private _routeService: RouteService,
     private _web3Service: Web3Service
   ) {
+    const hasEtherBalance = localStorage.getItem(this.HasEtherBalanceStorageKey);
+    this._hasEtherBalance = !!hasEtherBalance;
     const etherTransactionHash = localStorage.getItem(this.EtherTransactionHashStorageKey);
     if (!! etherTransactionHash) {
       this._etherTransactionHash = etherTransactionHash;
-    }
-    const tokenTransactionHash = localStorage.getItem(this.TokenTransactionHashStorageKey);
-    if (!!tokenTransactionHash) {
-      this._tokenTransactionHash = tokenTransactionHash;
-    }
-    const tokenTransferHash = localStorage.getItem(this.TokenTransferHashStorageKey);
-    if (!!tokenTransferHash) {
-      this._tokenTransferHash = tokenTransferHash;
     }
    }
 
@@ -60,65 +51,38 @@ export class Part2ValidationService implements CanActivate {
     return false;
   }
 
-  async isValidTokenTransactionSubmit(transactionHash: string): Promise<boolean> {
-    const isValidTransaction = await this.isValidEtherTransactionSubmit(transactionHash);
-    if (isValidTransaction) {
-      const receipt = await this._web3Service.getTransactionReceipt(transactionHash);
-      if (!!receipt.contractAddress) {
-        return await this._erc20Service.isValidErc20(receipt.contractAddress);
-      }
-    }
-    return false;
+  get hasDoneEtherBalance(): boolean {
+    return this._hasEtherBalance;
   }
 
   get hasDoneEtherTransaction(): boolean {
     return !!this._etherTransactionHash;
   }
 
-  get hasDoneTokenTransaction(): boolean {
-    return !!this._tokenTransactionHash;
-  }
-
-  get hasDoneTokenTransfer(): boolean {
-    return !!this._tokenTransferHash;
-  }
-
   get partComplete(): boolean {
-    return this.hasDoneEtherTransaction && this.hasDoneTokenTransaction && this.hasDoneTokenTransfer;
+    return this.hasDoneEtherTransaction && this.hasDoneEtherBalance;
   }
 
   reset(): void {
+    this._hasEtherBalance = false;
     this._etherTransactionHash = '';
-    this._tokenTransactionHash = '';
-    this._tokenTransferHash = '';
+    localStorage.setItem(this.HasEtherBalanceStorageKey, 'false');
     localStorage.setItem(this.EtherTransactionHashStorageKey, this._etherTransactionHash);
-    localStorage.setItem(this.TokenTransactionHashStorageKey, this._tokenTransactionHash);
-    localStorage.setItem(this.TokenTransferHashStorageKey, this._tokenTransferHash);
   }
 
-  submitEtherTransactionHash(transactionHash: string): void {
-    (async () => {
-      if (await this.isValidEtherTransactionSubmit(transactionHash)) {
-        const receipt = await this._web3Service.getTransactionReceipt(transactionHash);
-        this._etherTransactionHash = receipt.transactionHash;
-        localStorage.setItem(this.EtherTransactionHashStorageKey, this._etherTransactionHash);
-      }
-    })();
+  setHasEtherBalance(has: boolean): void {
+    this._hasEtherBalance = has;
+    localStorage.setItem(this.HasEtherBalanceStorageKey, has + '');
   }
 
-  submitTokenTransactionHash(transactionHash: string): void {
-    (async () => {
-      if (await this.isValidTokenTransactionSubmit(transactionHash)) {
-        const receipt = await this._web3Service.getTransactionReceipt(transactionHash);
-        this._tokenTransactionHash = receipt.transactionHash;
-        localStorage.setItem(this.TokenTransactionHashStorageKey, this._tokenTransactionHash);
-      }
-    })();
-  }
-
-  submitTokenTransferHash(transactionHash: string): void {
-    this._tokenTransferHash = transactionHash;
-    localStorage.setItem(this.TokenTransferHashStorageKey, this._tokenTransferHash);
+  public async submitEtherTransactionHash(transactionHash: string): Promise<boolean> {
+    if (await this.isValidEtherTransactionSubmit(transactionHash)) {
+      const receipt = await this._web3Service.getTransactionReceipt(transactionHash);
+      this._etherTransactionHash = receipt.transactionHash;
+      localStorage.setItem(this.EtherTransactionHashStorageKey, this._etherTransactionHash);
+      return true;
+    }
+    return false;
   }
 
 }

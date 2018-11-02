@@ -5,8 +5,9 @@ import { Erc20Service } from '@services/erc20.service';
 import { RouteService } from '@services/route.service';
 import { Part2ValidationService } from '@services/access/part2-validation.service';
 import { Erc721Service } from '@services/erc721.service';
-import { Part3ValidationService } from '@services/access/part3-validation.service';
+import { Part4ValidationService } from '@services/access/part4-validation.service';
 import { MenuService } from '@services/menu.service';
+import { Part3ValidationService } from '@services/access/part3-validation.service';
 
 @Component({
   selector: 'app-reset',
@@ -22,6 +23,7 @@ export class ResetComponent {
     private _menuService: MenuService,
     private _part2ValidationService: Part2ValidationService,
     private _part3ValidationService: Part3ValidationService,
+    private _part4ValidationService: Part4ValidationService,
     private _routeService: RouteService,
     private _web3Service: Web3Service,
   ) { }
@@ -29,7 +31,7 @@ export class ResetComponent {
   reset() {
     this._part2ValidationService.reset();
     this._part3ValidationService.reset();
-    this._erc20Service.reset();
+    this._part4ValidationService.reset();
     this._erc721Service.reset();
     this._keyService.resetKey();
     this._web3Service.resetNodeAddress();

@@ -53,6 +53,7 @@
   width: 900px;
   margin: 0 auto;
   position: relative;
+  margin-bottom: 30px;
 }
 
 #erc721-application * {
@@ -193,3 +194,6 @@
   vertical-align: top;
 }
 
+.not-for-sale {
+  padding-bottom: 25px;
+}

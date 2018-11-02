@@ -1,0 +1,11 @@
+{
+	"abi": [
+		{
+			"what": "This should be an array of objects"
+		},
+		{
+			"how": "just copy the whole abi file behind abi"
+		}
+	],
+	"bin": "This is what you should pase the binary in"
+}

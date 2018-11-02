@@ -1,88 +1,104 @@
 import { Injectable } from '@angular/core';
-import { Part2ValidationService } from './part2-validation.service';
-import { Router } from '@angular/router';
-import { environment } from '@environments/environment';
+import { CanActivate } from '@angular/router';
+import { RouteService } from '@services/route.service';
+import { Part2ValidationService } from '@services/access/part2-validation.service';
 
 @Injectable()
-export class Part3ValidationService {
+export class Part3ValidationService implements CanActivate {
 
-  private _erc721Address: string;
-  private readonly Erc721ContractAddressKey = 'bcg_erc721_contract_address';
+  private _tokenAddress: string;
+  private readonly TokenAddressStorageKey = 'bcg_token_transaction_hash';
 
-  private _erc721HasTokens = false;
-  private readonly Erc721HasTokensKey = 'bcg_erc721_has_tokens';
+  private _hasDoneTokenBalance: boolean;
+  private readonly HasDoneTokenBalanceStorageKey = 'bcg_erc20_has_done_balance';
 
-  private _purchasedId = -1;
-  private readonly PurchasedIdKey = 'bcg_erc721_purchased_id';
+  private _tokenTransferHash: string;
+  private readonly TokenTransferHashStorageKey = 'bcg_token_transfer_hash';
+
+  private _hasDoneTokenEvent: boolean;
+  private readonly HasDoneTokenEventStorageKey = 'bcg_erc20_has_done_event';
 
   constructor(
     private _part2ValidationService: Part2ValidationService,
-    private _router: Router
-  ) { }
+    private _routeService: RouteService
+  ) {
+    const tokenAddress = localStorage.getItem(this.TokenAddressStorageKey);
+    if (!!tokenAddress) {
+      this._tokenAddress = tokenAddress;
+    }
+    this._hasDoneTokenBalance = localStorage.getItem(this.HasDoneTokenBalanceStorageKey) == 'true';
+    const tokenTransferHash = localStorage.getItem(this.TokenTransferHashStorageKey);
+    if (!!tokenTransferHash) {
+      this._tokenTransferHash = tokenTransferHash;
+    }
+    this._hasDoneTokenEvent = localStorage.getItem(this.HasDoneTokenEventStorageKey) == 'true';
+   }
 
-  canActivate(params, routeConfig, navigationInstruction) {
-    const part2Complete = this._part2ValidationService.partComplete;
-    if (part2Complete) {
+   // @ts-ignore
+  canActivate(redirectOnFalse: boolean = true): boolean {
+    if (this._part2ValidationService.partComplete) {
       return true;
+    } else if (redirectOnFalse) {
+      this._routeService.navigateToPart1();
     } else {
-      this._router.navigateByUrl(environment.routes.part1);
+      return false;
     }
   }
 
-  public getErc721ContractAddress(): string {
-    if (!this._erc721Address) {
-      this._erc721Address = localStorage.getItem(this.Erc721ContractAddressKey);
-    }
-    return this._erc721Address;
+  get hasDoneTokenBalance(): boolean {
+    return this._hasDoneTokenBalance;
   }
 
-  public getErc721HasTokens(): boolean {
-    return !!localStorage.getItem(this.Erc721HasTokensKey);
+  get hasDoneTokenDeployment(): boolean {
+    return !!this._tokenAddress;
   }
 
-  public hasDonePurchase(): boolean {
-    if (this._purchasedId < 0) {
-      const idString = localStorage.getItem(this.PurchasedIdKey);
-      if (!!idString && !!idString.length) {
-        try {
-          this._purchasedId = parseInt(idString);
-        } catch (e) {
-
-        }
-      }
-    }
-    return this._purchasedId >= 0;
+  get hasDoneTokenEvent(): boolean {
+    return this._hasDoneTokenEvent;
   }
 
-  public get partComplete(): boolean {
-    return this.hasDonePurchase() && this.getErc721HasTokens();
+  get hasDoneTokenTransfer(): boolean {
+    return !!this._tokenTransferHash;
   }
 
-  public reset(): void {
-    this.setErc721HasTokens(false);
-    this.setErc721Address('');
-    this.setPurchasedId(-1);
+  public get lastContractAddress(): string {
+    return this._tokenAddress;
   }
 
-  public setErc721Address(address: string): void {
-    this._erc721Address = address;
-    localStorage.setItem(this.Erc721ContractAddressKey, this._erc721Address);
+  get partComplete(): boolean {
+    return this.hasDoneTokenDeployment && 
+    this.hasDoneTokenBalance && 
+    this.hasDoneTokenTransfer && 
+    this.hasDoneTokenEvent;
   }
 
-  public setErc721HasTokens(has: boolean) {
-    this._erc721HasTokens = has;
-    localStorage.setItem(this.Erc721HasTokensKey, this._erc721HasTokens + '');
+  reset(): void {
+    this.setHasDoneTokenBalance(false);
+    this.setHasDoneTokenEvent(false);
+    this._tokenAddress = '';
+    this._tokenTransferHash = '';
+    localStorage.setItem(this.TokenAddressStorageKey, this._tokenAddress);
+    localStorage.setItem(this.TokenTransferHashStorageKey, this._tokenTransferHash);
   }
 
-  public setPurchasedId(id: number) {
-    if (id >= 0) {
-      this._purchasedId = id;
-      localStorage.setItem(this.PurchasedIdKey, this._purchasedId + '');
-    } else {
-      // Removed.
-      delete this._purchasedId;
-      localStorage.setItem(this.PurchasedIdKey, '');
-    }
+  setHasDoneTokenBalance(has: boolean): void {
+    this._hasDoneTokenBalance = has;
+    localStorage.setItem(this.HasDoneTokenBalanceStorageKey, has + '');
+  }
+
+  setHasDoneTokenEvent(has: boolean): void {
+    this._hasDoneTokenEvent = has;
+    localStorage.setItem(this.HasDoneTokenEventStorageKey, has + '');
+  }
+
+  submitTokenAddress(contractAddress: string): void {
+    this._tokenAddress = contractAddress;
+    localStorage.setItem(this.TokenAddressStorageKey, contractAddress);
+  }
+
+  submitTokenTransferHash(transactionHash: string): void {
+    this._tokenTransferHash = transactionHash;
+    localStorage.setItem(this.TokenTransferHashStorageKey, this._tokenTransferHash);
   }
 
 }
